@@ -1,0 +1,14 @@
+{
+  "valid": true,
+  "player_count": 15,
+  "rating_count": 180,
+  "price_count": 45,
+  "weeks": [
+    1,
+    2,
+    3
+  ],
+  "errors": 0,
+  "warnings": 0,
+  "issues": []
+}
