@@ -68,6 +68,8 @@ export default function DraftDashboard({
             .filter((player) => !isEvicted(player))
             .map((player) => player.player_id),
         );
+        const leaderboardPlayerIds =
+          metric === "price" ? activePlayerIds : playerIds;
         const rows = dataset.summaries.filter(
           (row) =>
             playerIds.has(row.player_id) &&
@@ -77,7 +79,7 @@ export default function DraftDashboard({
         const currentValue = dataset.summaries
           .filter(
             (row) =>
-              activePlayerIds.has(row.player_id) &&
+              leaderboardPlayerIds.has(row.player_id) &&
               row.week === selectedWeek &&
               (metric === "rating" || row.price !== ""),
           )
@@ -361,8 +363,9 @@ export default function DraftDashboard({
             </p>
             <h2 className="mt-1 text-2xl font-bold">Draft standings</h2>
             <p className="mt-1 text-sm text-text-secondary">
-              Ranked by active players&apos; combined Week {selectedWeek}{" "}
-              {metric === "price" ? "stock price" : "rating"}.
+              {metric === "price"
+                ? `Ranked by active players' combined Week ${selectedWeek} stock price.`
+                : `Ranked by every scored player's combined Week ${selectedWeek} rating, including eviction-week results.`}
             </p>
             <p className="mt-2 text-xs font-semibold text-brand-light">
               Select a team below to update its player breakdown.
