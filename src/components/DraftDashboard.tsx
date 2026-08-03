@@ -199,6 +199,9 @@ export default function DraftDashboard({
               Ranked by active players&apos; combined Week {selectedWeek} stock
               price.
             </p>
+            <p className="mt-2 text-xs font-semibold text-brand-light">
+              Select a team below to update its player breakdown.
+            </p>
           </div>
           <div
             className="flex gap-1 overflow-x-auto rounded-xl bg-neutral-bg2 p-1"
@@ -236,6 +239,7 @@ export default function DraftDashboard({
                 <button
                   type="button"
                   onClick={() => setSelectedTeamId(team.id)}
+                  aria-pressed={selected}
                   className={clsx(
                     "grid w-full grid-cols-[54px_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border p-3 text-left transition-colors sm:grid-cols-[72px_minmax(0,1fr)_150px]",
                     selected
@@ -258,6 +262,11 @@ export default function DraftDashboard({
                       <span className="truncate text-base font-bold sm:text-lg">
                         {team.name}
                       </span>
+                      {selected && (
+                        <span className="shrink-0 rounded-full bg-brand px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-white">
+                          Viewing
+                        </span>
+                      )}
                       <span className="shrink-0 text-xs text-text-muted">
                         {team.activeCount} remaining
                       </span>
@@ -286,12 +295,18 @@ export default function DraftDashboard({
           })}
         </ol>
 
-        <div className="mt-5 border-t border-border-subtle pt-5">
+        <div className="mt-5 rounded-xl border border-brand/25 bg-brand/5 p-4 sm:p-5">
           <div className="mb-4 flex items-center justify-between gap-4">
             <div>
-              <h3 className="text-xl font-bold">{selectedTeam.name}'s team</h3>
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-brand-light">
+                Selected team
+              </p>
+              <h3 className="mt-1 text-xl font-bold">
+                {selectedTeam.name}'s team
+              </h3>
               <p className="mt-1 text-sm text-text-secondary">
-                Individual performance through Week {selectedWeek}
+                Individual performance through Week {selectedWeek}. Select a
+                player to open their season details.
               </p>
             </div>
             <span className="rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-bold text-brand-light">
@@ -369,6 +384,9 @@ export default function DraftDashboard({
                         accent
                       />
                     </div>
+                    <p className="mt-3 text-xs font-bold text-brand-light">
+                      View season details →
+                    </p>
                   </button>
                 );
               },
