@@ -8,6 +8,7 @@ interface PlayerAvatarProps {
   ringColor?: string;
   square?: boolean;
   evicted?: boolean;
+  preserveColor?: boolean;
 }
 
 export function PlayerAvatar({
@@ -16,6 +17,7 @@ export function PlayerAvatar({
   ringColor,
   square = false,
   evicted = false,
+  preserveColor = false,
 }: PlayerAvatarProps) {
   const name = player.nickname || player.first_name;
   const localImage = `${import.meta.env.BASE_URL}players/${player.season}/${player.slug}.webp`;
@@ -37,13 +39,7 @@ export function PlayerAvatar({
         square ? "rounded-none" : "rounded-full",
         className,
       )}
-      style={{
-        boxShadow: evicted
-          ? "0 0 0 2px #FB7185"
-          : ringColor
-            ? `0 0 0 2px ${ringColor}`
-            : undefined,
-      }}
+      style={{ boxShadow: ringColor ? `0 0 0 2px ${ringColor}` : undefined }}
     >
       {failed ? (
         <div className="flex h-full w-full items-center justify-center text-sm font-bold text-text-secondary">
@@ -53,7 +49,10 @@ export function PlayerAvatar({
         <img
           src={source}
           alt={`${name} ${player.last_name}`}
-          className="h-full w-full object-cover object-top"
+          className={clsx(
+            "h-full w-full object-cover object-top",
+            evicted && !preserveColor && "grayscale",
+          )}
           loading="lazy"
           decoding="async"
           referrerPolicy="no-referrer"

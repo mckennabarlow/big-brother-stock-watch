@@ -283,9 +283,10 @@ export default function App() {
                     player={player}
                     className="h-7 w-7"
                     ringColor={
-                      active ? (evicted ? "#FB7185" : color) : undefined
+                      evicted ? "#FB7185" : active ? color : undefined
                     }
                     evicted={evicted}
+                    preserveColor
                   />
                   {playerName(player)}
                 </button>
