@@ -3,6 +3,7 @@ import clsx from "clsx";
 import rawDataset from "../data/processed/bb28/dataset.json";
 import { PlayerAvatar } from "./components/PlayerAvatar";
 import { SeasonChart, playerColor } from "./components/SeasonChart";
+import { DRAFT_TEAMS } from "./teams";
 import type {
   Metric,
   Player,
@@ -87,6 +88,7 @@ export default function App() {
   const [focusedPlayerId, setFocusedPlayerId] = useState(
     latestRanking[0]?.player_id ?? dataset.players[0].player_id,
   );
+  const [selectedTeamId, setSelectedTeamId] = useState(DRAFT_TEAMS[0].id);
 
   const weekRanking = useMemo(
     () =>
@@ -130,6 +132,60 @@ export default function App() {
         item.change !== null,
     )
     .sort((left, right) => right.change - left.change)[0];
+  const teamStandings = useMemo(
+    () =>
+      DRAFT_TEAMS.map((team) => {
+        const players = team.playerSlugs
+          .map((slug) =>
+            dataset.players.find((player) => player.slug === slug),
+          )
+          .filter((player): player is Player => Boolean(player));
+        const playerIds = new Set(players.map((player) => player.player_id));
+        const rows = dataset.summaries.filter(
+          (row) =>
+            playerIds.has(row.player_id) && row.week <= selectedWeek,
+        );
+        const currentRows = rows.filter((row) => row.week === selectedWeek);
+
+        return {
+          ...team,
+          players,
+          currentTotal: currentRows.reduce(
+            (sum, row) => sum + Number(row.average_rating),
+            0,
+          ),
+          cumulativeTotal: rows.reduce(
+            (sum, row) => sum + Number(row.average_rating),
+            0,
+          ),
+          currentPlayerCount: currentRows.length,
+        };
+      }).sort(
+        (left, right) => right.cumulativeTotal - left.cumulativeTotal,
+      ),
+    [selectedWeek],
+  );
+  const selectedTeam =
+    teamStandings.find((team) => team.id === selectedTeamId) ??
+    teamStandings[0];
+  const leadingTeamScore = teamStandings[0]?.cumulativeTotal ?? 0;
+  const selectedTeamPlayerStats = selectedTeam.players.map((player) => {
+    const rows = dataset.summaries
+      .filter(
+        (row) =>
+          row.player_id === player.player_id && row.week <= selectedWeek,
+      )
+      .sort((left, right) => left.week - right.week);
+    const current = rows.find((row) => row.week === selectedWeek);
+    const scores = rows.map((row) => Number(row.average_rating));
+
+    return {
+      player,
+      currentScore: current ? Number(current.average_rating) : null,
+      highestScore: scores.length ? Math.max(...scores) : null,
+      cumulativeScore: scores.reduce((sum, score) => sum + score, 0),
+    };
+  });
 
   function togglePlayer(playerId: number) {
     setVisiblePlayerIds((current) => {
@@ -501,6 +557,180 @@ export default function App() {
           </aside>
         </div>
 
+        <section className="glass-card mt-6 overflow-hidden p-4 sm:p-6">
+          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-light">
+                Friends draft
+              </p>
+              <h2 className="mt-1 text-2xl font-bold">Team stock watch</h2>
+              <p className="mt-1 text-sm text-text-secondary">
+                Week {selectedWeek} scores and cumulative standings through
+                Week {selectedWeek}.
+              </p>
+            </div>
+            <p className="text-xs text-text-muted">
+              Ranked by total cumulative rating
+            </p>
+          </div>
+
+          <div className="-mx-4 flex gap-3 overflow-x-auto px-4 pb-3 sm:mx-0 sm:grid sm:grid-cols-2 sm:px-0 xl:grid-cols-5">
+            {teamStandings.map((team, index) => {
+              const selected = team.id === selectedTeam.id;
+              const progress =
+                leadingTeamScore > 0
+                  ? (team.cumulativeTotal / leadingTeamScore) * 100
+                  : 0;
+
+              return (
+                <button
+                  type="button"
+                  key={team.id}
+                  onClick={() => setSelectedTeamId(team.id)}
+                  className={clsx(
+                    "min-w-[190px] rounded-xl border p-4 text-left transition-colors sm:min-w-0",
+                    selected
+                      ? "border-brand/60 bg-brand/10"
+                      : "border-border-subtle bg-neutral-bg3 hover:border-border",
+                  )}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-bold">{team.name}</span>
+                    <span
+                      className={clsx(
+                        "flex h-7 w-7 items-center justify-center rounded-full text-xs font-black",
+                        index === 0
+                          ? "bg-brand text-white"
+                          : "bg-neutral-bg4 text-text-secondary",
+                      )}
+                    >
+                      {index + 1}
+                    </span>
+                  </div>
+                  <div className="mt-4 flex items-end justify-between gap-3">
+                    <div>
+                      <p className="text-2xl font-bold">
+                        {team.cumulativeTotal.toFixed(2)}
+                      </p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
+                        Cumulative
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-brand-light">
+                        {team.currentTotal.toFixed(2)}
+                      </p>
+                      <p className="text-[10px] text-text-muted">
+                        Week {selectedWeek}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-neutral-bg4">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-brand to-cyan-400"
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                  <p className="mt-2 text-[11px] text-text-muted">
+                    {team.currentPlayerCount} of {team.players.length} scored
+                    this week
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-5 border-t border-border-subtle pt-5">
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-bold">{selectedTeam.name}'s team</h3>
+                <p className="mt-1 text-sm text-text-secondary">
+                  Individual performance through Week {selectedWeek}
+                </p>
+              </div>
+              <span className="rounded-full border border-brand/30 bg-brand/10 px-3 py-1 text-xs font-bold text-brand-light">
+                {selectedTeam.players.length} players
+              </span>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {selectedTeamPlayerStats.map(
+                ({
+                  player,
+                  currentScore,
+                  highestScore,
+                  cumulativeScore,
+                }) => {
+                  const evicted = isEvicted(player);
+
+                  return (
+                    <button
+                      type="button"
+                      key={player.player_id}
+                      onClick={() => focusPlayer(player.player_id)}
+                      className="rounded-xl border border-border-subtle bg-neutral-bg3 p-4 text-left transition-colors hover:border-border"
+                    >
+                      <div className="flex items-center gap-3">
+                        <PlayerAvatar
+                          player={player}
+                          className="h-12 w-12"
+                          ringColor={
+                            evicted
+                              ? "#FB7185"
+                              : playerColor(player.player_id, dataset.players)
+                          }
+                          evicted={evicted}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-bold">
+                            {playerName(player)}
+                          </p>
+                          <p
+                            className={clsx(
+                              "mt-0.5 text-xs",
+                              evicted
+                                ? "text-status-error"
+                                : "text-status-success",
+                            )}
+                          >
+                            {evicted
+                              ? `Evicted Week ${player.eviction_week}`
+                              : "Active"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 grid grid-cols-3 gap-2">
+                        <TeamMetric
+                          label={`Week ${selectedWeek}`}
+                          value={
+                            currentScore === null
+                              ? "—"
+                              : currentScore.toFixed(2)
+                          }
+                        />
+                        <TeamMetric
+                          label="Highest"
+                          value={
+                            highestScore === null
+                              ? "—"
+                              : highestScore.toFixed(2)
+                          }
+                        />
+                        <TeamMetric
+                          label="Cumulative"
+                          value={cumulativeScore.toFixed(2)}
+                          accent
+                        />
+                      </div>
+                    </button>
+                  );
+                },
+              )}
+            </div>
+          </div>
+        </section>
+
         <footer className="mt-8 flex flex-col gap-2 border-t border-border-subtle py-6 text-xs text-text-muted sm:flex-row sm:justify-between">
           <p>
             Ratings and prices sourced from{" "}
@@ -573,6 +803,32 @@ function DetailStat({ label, value }: { label: string; value: string }) {
         {label}
       </p>
       <p className="mt-1 font-bold">{value}</p>
+    </div>
+  );
+}
+
+function TeamMetric({
+  label,
+  value,
+  accent = false,
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
+  return (
+    <div className="rounded-lg bg-neutral-bg4 p-2.5">
+      <p className="truncate text-[9px] font-bold uppercase tracking-wider text-text-muted">
+        {label}
+      </p>
+      <p
+        className={clsx(
+          "mt-1 text-base font-bold",
+          accent && "text-brand-light",
+        )}
+      >
+        {value}
+      </p>
     </div>
   );
 }
