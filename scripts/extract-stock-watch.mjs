@@ -340,6 +340,11 @@ async function main() {
 
   await Promise.all([
     writeFile(
+      join(outputDirectory, "dataset.json"),
+      `${JSON.stringify(data, null, 2)}\n`,
+      "utf8",
+    ),
+    writeFile(
       join(outputDirectory, "season.json"),
       `${JSON.stringify(data.metadata, null, 2)}\n`,
       "utf8",
