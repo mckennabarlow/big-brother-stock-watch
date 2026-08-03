@@ -568,9 +568,7 @@ export default function DraftDashboard({
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-light">
             Data-driven insights
           </p>
-          <h2 className="mt-1 text-2xl font-bold">
-            {selectedTeam.name} team insights
-          </h2>
+          <h2 className="mt-1 text-2xl font-bold">Team insights</h2>
           <p className="mt-1 text-sm text-text-secondary">
             What changed through Week {selectedWeek} and which players drove
             the movement.
