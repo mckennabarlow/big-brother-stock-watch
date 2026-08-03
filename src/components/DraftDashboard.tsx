@@ -562,11 +562,9 @@ export default function DraftDashboard({
               },
             )}
           </div>
-        </div>
-      </section>
 
-      <section className="glass-card overflow-hidden p-4 sm:p-6">
-        <div className="mb-5">
+          <div className="mt-6 border-t border-brand/20 pt-5">
+            <div className="mb-5">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-light">
             Data-driven insights
           </p>
@@ -638,6 +636,8 @@ export default function DraftDashboard({
             }
             tone={evictedPlayers.length ? "negative" : "positive"}
           />
+            </div>
+          </div>
         </div>
       </section>
     </div>
