@@ -88,6 +88,7 @@ export default function App() {
   );
 
   const [metric, setMetric] = useState<Metric>("rating");
+  const [draftMetric, setDraftMetric] = useState<Metric>("price");
   const [selectedWeek, setSelectedWeek] = useState(latestWeek);
   const [visiblePlayerIds, setVisiblePlayerIds] =
     useState<Set<number>>(defaultPlayerIds);
@@ -189,29 +190,36 @@ export default function App() {
             </p>
           </div>
 
-          {activeView === "season" && (
-            <div
-              className="grid w-full grid-cols-2 rounded-xl border border-border bg-neutral-bg2/80 p-1 sm:inline-flex sm:w-auto"
-              role="group"
-              aria-label="Chart metric"
-            >
-              {(["rating", "price"] as Metric[]).map((option) => (
+          <div
+            className="grid w-full grid-cols-2 rounded-xl border border-border bg-neutral-bg2/80 p-1 sm:inline-flex sm:w-auto"
+            role="group"
+            aria-label={`${activeView === "season" ? "Season" : "Draft team"} metric`}
+          >
+            {(["rating", "price"] as Metric[]).map((option) => {
+              const activeMetric =
+                activeView === "season" ? metric : draftMetric;
+
+              return (
                 <button
                   key={option}
                   type="button"
-                  onClick={() => setMetric(option)}
+                  onClick={() =>
+                    activeView === "season"
+                      ? setMetric(option)
+                      : setDraftMetric(option)
+                  }
                   className={clsx(
                     "min-h-touch rounded-lg px-5 text-sm font-semibold transition-colors",
-                    metric === option
+                    activeMetric === option
                       ? "bg-brand text-white shadow-glow"
                       : "text-text-secondary hover:bg-neutral-bg4 hover:text-white",
                   )}
                 >
                   {option === "rating" ? "Ratings" : "Stock price"}
                 </button>
-              ))}
-            </div>
-          )}
+              );
+            })}
+          </div>
         </header>
 
         <nav
@@ -552,6 +560,7 @@ export default function App() {
               dataset={dataset}
               weeks={weeks}
               selectedWeek={selectedWeek}
+              metric={draftMetric}
               onSelectWeek={setSelectedWeek}
               onViewPlayer={(playerId) => {
                 focusPlayer(playerId);

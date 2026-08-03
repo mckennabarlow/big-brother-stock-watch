@@ -1,14 +1,16 @@
 import { useMemo, useState } from "react";
 import clsx from "clsx";
 import { DRAFT_TEAMS } from "../teams";
-import type { Player, StockWatchDataset } from "../types";
+import type { Metric, Player, StockWatchDataset } from "../types";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { playerColor } from "./SeasonChart";
+import { TeamMetricChart } from "./TeamMetricChart";
 
 interface DraftDashboardProps {
   dataset: StockWatchDataset;
   weeks: number[];
   selectedWeek: number;
+  metric: Metric;
   onSelectWeek: (week: number) => void;
   onViewPlayer: (playerId: number) => void;
 }
@@ -28,10 +30,22 @@ function ordinal(rank: number) {
   return `${rank}th`;
 }
 
+function metricValue(
+  row: StockWatchDataset["summaries"][number],
+  metric: Metric,
+) {
+  return metric === "rating" ? Number(row.average_rating) : Number(row.price);
+}
+
+function formatMetric(value: number, metric: Metric) {
+  return metric === "price" ? `$${value.toFixed(2)}` : value.toFixed(2);
+}
+
 export default function DraftDashboard({
   dataset,
   weeks,
   selectedWeek,
+  metric,
   onSelectWeek,
   onViewPlayer,
 }: DraftDashboardProps) {
@@ -52,50 +66,55 @@ export default function DraftDashboard({
         );
         const rows = dataset.summaries.filter(
           (row) =>
-            playerIds.has(row.player_id) && row.week <= selectedWeek,
+            playerIds.has(row.player_id) &&
+            row.week <= selectedWeek &&
+            (metric === "rating" || row.price !== ""),
         );
+        const currentValue = dataset.summaries
+          .filter(
+            (row) =>
+              activePlayerIds.has(row.player_id) &&
+              row.week === selectedWeek &&
+              (metric === "rating" || row.price !== ""),
+          )
+          .reduce((sum, row) => sum + metricValue(row, metric), 0);
 
         return {
           ...team,
           players,
           activeCount: players.filter((player) => !isEvicted(player)).length,
-          currentStockValue: dataset.summaries
-            .filter(
-              (row) =>
-                activePlayerIds.has(row.player_id) &&
-                row.week === selectedWeek &&
-                row.price !== "",
-            )
-            .reduce((sum, row) => sum + Number(row.price), 0),
+          currentValue,
           cumulativeTotal: rows.reduce(
-            (sum, row) => sum + Number(row.average_rating),
+            (sum, row) => sum + metricValue(row, metric),
             0,
           ),
         };
       }),
-    [dataset, selectedWeek],
+    [dataset, metric, selectedWeek],
   );
   const teamStandings = [...teams].sort(
-    (left, right) => right.currentStockValue - left.currentStockValue,
+    (left, right) => right.currentValue - left.currentValue,
   );
   const selectedTeam =
     teams.find((team) => team.id === selectedTeamId) ?? teams[0];
-  const leadingTeamScore = teamStandings[0]?.currentStockValue ?? 0;
+  const leadingTeamScore = teamStandings[0]?.currentValue ?? 0;
   const selectedTeamPlayerStats = selectedTeam.players.map((player) => {
     const rows = dataset.summaries
       .filter(
         (row) =>
-          row.player_id === player.player_id && row.week <= selectedWeek,
+          row.player_id === player.player_id &&
+          row.week <= selectedWeek &&
+          (metric === "rating" || row.price !== ""),
       )
       .sort((left, right) => left.week - right.week);
     const current = rows.find((row) => row.week === selectedWeek);
-    const scores = rows.map((row) => Number(row.average_rating));
+    const values = rows.map((row) => metricValue(row, metric));
 
     return {
       player,
-      currentScore: current ? Number(current.average_rating) : null,
-      highestScore: scores.length ? Math.max(...scores) : null,
-      cumulativeScore: scores.reduce((sum, score) => sum + score, 0),
+      currentValue: current ? metricValue(current, metric) : null,
+      highestValue: values.length ? Math.max(...values) : null,
+      cumulativeValue: values.reduce((sum, value) => sum + value, 0),
     };
   });
 
@@ -188,6 +207,15 @@ export default function DraftDashboard({
         </div>
       </section>
 
+      <TeamMetricChart
+        dataset={dataset}
+        teams={teams}
+        weeks={weeks}
+        metric={metric}
+        selectedTeamId={selectedTeam.id}
+        onSelectTeam={setSelectedTeamId}
+      />
+
       <section className="glass-card overflow-hidden p-4 sm:p-6">
         <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -196,8 +224,8 @@ export default function DraftDashboard({
             </p>
             <h2 className="mt-1 text-2xl font-bold">Draft standings</h2>
             <p className="mt-1 text-sm text-text-secondary">
-              Ranked by active players&apos; combined Week {selectedWeek} stock
-              price.
+              Ranked by active players&apos; combined Week {selectedWeek}{" "}
+              {metric === "price" ? "stock price" : "rating"}.
             </p>
             <p className="mt-2 text-xs font-semibold text-brand-light">
               Select a team below to update its player breakdown.
@@ -231,7 +259,7 @@ export default function DraftDashboard({
             const selected = team.id === selectedTeam.id;
             const progress =
               leadingTeamScore > 0
-                ? (team.currentStockValue / leadingTeamScore) * 100
+                ? (team.currentValue / leadingTeamScore) * 100
                 : 0;
 
             return (
@@ -278,15 +306,17 @@ export default function DraftDashboard({
                       />
                     </span>
                     <span className="mt-1.5 block text-[11px] text-text-muted">
-                      {team.cumulativeTotal.toFixed(2)} cumulative rating points
+                      {formatMetric(team.cumulativeTotal, metric)} cumulative{" "}
+                      {metric === "price" ? "stock value" : "rating points"}
                     </span>
                   </span>
                   <span className="text-right">
                     <span className="block text-xl font-black text-brand-light sm:text-2xl">
-                      ${team.currentStockValue.toFixed(2)}
+                      {formatMetric(team.currentValue, metric)}
                     </span>
                     <span className="block text-[10px] font-bold uppercase tracking-wider text-text-muted">
-                      Week {selectedWeek} stock
+                      Week {selectedWeek}{" "}
+                      {metric === "price" ? "stock" : "rating"}
                     </span>
                   </span>
                 </button>
@@ -318,9 +348,9 @@ export default function DraftDashboard({
             {selectedTeamPlayerStats.map(
               ({
                 player,
-                currentScore,
-                highestScore,
-                cumulativeScore,
+                currentValue,
+                highestValue,
+                cumulativeValue,
               }) => {
                 const evicted = isEvicted(player);
 
@@ -365,22 +395,22 @@ export default function DraftDashboard({
                       <TeamMetric
                         label={`Week ${selectedWeek}`}
                         value={
-                          currentScore === null
+                          currentValue === null
                             ? "—"
-                            : currentScore.toFixed(2)
+                            : formatMetric(currentValue, metric)
                         }
                       />
                       <TeamMetric
                         label="Highest"
                         value={
-                          highestScore === null
+                          highestValue === null
                             ? "—"
-                            : highestScore.toFixed(2)
+                            : formatMetric(highestValue, metric)
                         }
                       />
                       <TeamMetric
                         label="Cumulative"
-                        value={cumulativeScore.toFixed(2)}
+                        value={formatMetric(cumulativeValue, metric)}
                         accent
                       />
                     </div>
