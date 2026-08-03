@@ -51,6 +51,17 @@
             }
           }
         ]
+      },
+      {
+        "player_id": 183,
+        "first_name": "Jason",
+        "last_name": "De Puy",
+        "nickname": "Jason",
+        "slug": "jason",
+        "status": "evicted",
+        "eviction_week": 3,
+        "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/jason-de-puy.png",
+        "weeks": []
       }
     ]
   }

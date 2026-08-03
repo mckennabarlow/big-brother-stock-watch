@@ -7,7 +7,7 @@
     "current_week": 3,
     "closes_at": "2026-08-03T20:00:00.000000Z",
     "source": "https://realitystockwatch.com/trades",
-    "extracted_at": "2026-08-03T21:25:07.418Z"
+    "extracted_at": "2026-08-03T21:30:32.297Z"
   },
   "players": [
     {
@@ -105,9 +105,9 @@
       "last_name": "De Puy",
       "nickname": "Jason",
       "slug": "jason",
-      "status": "active",
-      "eviction_week": null,
-      "image_url": "https://realitystockwatch.com/storage//houseguests/bb28/jason-de-puy.png"
+      "status": "evicted",
+      "eviction_week": 3,
+      "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/jason-de-puy.png"
     },
     {
       "season": "bb28",

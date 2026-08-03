@@ -209,8 +209,12 @@ export function SeasonChart({
                   cx={point.x}
                   cy={point.y}
                   r={focused ? 7 : 5}
-                  fill="#121218"
-                  stroke={color}
+                  fill={
+                    player.eviction_week === point.week ? "#FB7185" : "#121218"
+                  }
+                  stroke={
+                    player.eviction_week === point.week ? "#FB7185" : color
+                  }
                   strokeWidth="3"
                 >
                   <title>
@@ -218,6 +222,7 @@ export function SeasonChart({
                     {metric === "price"
                       ? `$${point.value.toFixed(2)}`
                       : point.value.toFixed(2)}
+                    {player.eviction_week === point.week ? " (evicted)" : ""}
                   </title>
                 </circle>
               ))}
