@@ -31,7 +31,7 @@ export interface Rating {
   rater_name: string;
   rater_role: string;
   rating: number;
-  recorded_at: string;
+  recorded_at: string | null;
 }
 
 export interface Price {

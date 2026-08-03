@@ -1,0 +1,57 @@
+{
+  "bb28": {
+    "players": [
+      {
+        "player_id": 178,
+        "first_name": "Ashley",
+        "last_name": "Trail",
+        "nickname": "Ashley",
+        "slug": "ashley",
+        "status": "evicted",
+        "eviction_week": 1,
+        "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/ashley-trail.png",
+        "weeks": [
+          {
+            "week": 1,
+            "ratings": {
+              "1": 3,
+              "4": 3,
+              "9": 3,
+              "7620": 3
+            }
+          }
+        ]
+      },
+      {
+        "player_id": 189,
+        "first_name": "Rome",
+        "last_name": "Seymour",
+        "nickname": "Rome",
+        "slug": "rome",
+        "status": "evicted",
+        "eviction_week": 2,
+        "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/rome-seymour.png",
+        "weeks": [
+          {
+            "week": 1,
+            "ratings": {
+              "1": 5,
+              "4": 4,
+              "9": 5,
+              "7620": 5
+            }
+          },
+          {
+            "week": 2,
+            "ratings": {
+              "1": 3,
+              "4": 2,
+              "9": 2,
+              "7620": 2
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

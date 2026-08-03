@@ -1,5 +1,4 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { motion } from "framer-motion";
 import clsx from "clsx";
 import rawDataset from "../data/processed/bb28/dataset.json";
 import { PlayerAvatar } from "./components/PlayerAvatar";
@@ -25,6 +24,10 @@ function metricValue(row: WeeklySummary, metric: Metric) {
   return metric === "rating" ? Number(row.average_rating) : Number(row.price);
 }
 
+function hasMetricValue(row: WeeklySummary, metric: Metric) {
+  return metric === "rating" || row.price !== "";
+}
+
 function formatMetric(value: number, metric: Metric) {
   return metric === "rating" ? value.toFixed(2) : `$${value.toFixed(2)}`;
 }
@@ -42,6 +45,12 @@ function movement(
     (row) => row.player_id === playerId && row.week === week - 1,
   );
   if (!current || !previous) {
+    return null;
+  }
+  if (
+    !hasMetricValue(current, metric) ||
+    !hasMetricValue(previous, metric)
+  ) {
     return null;
   }
   return metricValue(current, metric) - metricValue(previous, metric);
@@ -82,7 +91,10 @@ export default function App() {
   const weekRanking = useMemo(
     () =>
       dataset.summaries
-        .filter((row) => row.week === selectedWeek)
+        .filter(
+          (row) =>
+            row.week === selectedWeek && hasMetricValue(row, metric),
+        )
         .sort(
           (left, right) =>
             metricValue(right, metric) - metricValue(left, metric),
@@ -142,16 +154,12 @@ export default function App() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-neutral-bg1 text-text-primary">
       <div className="pointer-events-none fixed inset-0">
-        <div className="absolute -left-32 top-12 h-96 w-96 rounded-full bg-brand/15 blur-[120px]" />
-        <div className="absolute -right-24 top-80 h-80 w-80 rounded-full bg-cyan-500/10 blur-[120px]" />
+        <div className="absolute -left-32 top-12 hidden h-96 w-96 rounded-full bg-brand/15 blur-[120px] md:block" />
+        <div className="absolute -right-24 top-80 hidden h-80 w-80 rounded-full bg-cyan-500/10 blur-[120px] md:block" />
       </div>
 
       <main className="relative mx-auto max-w-[1500px] px-4 py-6 pb-safe-bottom sm:px-6 lg:px-10 lg:py-10">
-        <motion.header
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between"
-        >
+        <header className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <div className="mb-3 flex flex-wrap items-center gap-3">
               <span className="rounded-full border border-brand/30 bg-brand/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-brand-light">
@@ -180,10 +188,9 @@ export default function App() {
             aria-label="Chart metric"
           >
             {(["rating", "price"] as Metric[]).map((option) => (
-              <motion.button
+              <button
                 key={option}
                 type="button"
-                whileTap={{ scale: 0.97 }}
                 onClick={() => setMetric(option)}
                 className={clsx(
                   "min-h-touch rounded-lg px-5 text-sm font-semibold transition-colors",
@@ -193,10 +200,10 @@ export default function App() {
                 )}
               >
                 {option === "rating" ? "Ratings" : "Stock price"}
-              </motion.button>
+              </button>
             ))}
           </div>
-        </motion.header>
+        </header>
 
         <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           <StatCard
@@ -258,10 +265,9 @@ export default function App() {
               const evicted = isEvicted(player);
               const color = playerColor(player.player_id, dataset.players);
               return (
-                <motion.button
+                <button
                   type="button"
                   key={player.player_id}
-                  whileTap={{ scale: 0.96 }}
                   onClick={() => togglePlayer(player.player_id)}
                   aria-pressed={active}
                   className={clsx(
@@ -282,7 +288,7 @@ export default function App() {
                     evicted={evicted}
                   />
                   {playerName(player)}
-                </motion.button>
+                </button>
               );
             })}
           </div>
@@ -326,17 +332,8 @@ export default function App() {
               </div>
             </div>
 
-            <motion.div
+            <div
               key={`${metric}-${selectedWeek}`}
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: {
-                  opacity: 1,
-                  transition: { staggerChildren: 0.035 },
-                },
-              }}
               className="grid gap-3 md:grid-cols-2"
             >
               {weekRanking.map((row, index) => {
@@ -352,14 +349,9 @@ export default function App() {
                 const color = playerColor(player.player_id, dataset.players);
                 const evicted = isEvicted(player);
                 return (
-                  <motion.button
+                  <button
                     type="button"
                     key={row.player_id}
-                    variants={{
-                      hidden: { opacity: 0, y: 8 },
-                      visible: { opacity: 1, y: 0 },
-                    }}
-                    whileHover={{ y: -2 }}
                     onClick={() => focusPlayer(row.player_id)}
                     className={clsx(
                       "flex min-h-[76px] items-center gap-3 rounded-xl border p-3 text-left transition-colors",
@@ -403,16 +395,14 @@ export default function App() {
                     <span className="text-lg font-bold" style={{ color }}>
                       {formatMetric(metricValue(row, metric), metric)}
                     </span>
-                  </motion.button>
+                  </button>
                 );
               })}
-            </motion.div>
+            </div>
           </section>
 
-          <motion.aside
+          <aside
             key={`${focusedPlayerId}-${selectedWeek}`}
-            initial={{ opacity: 0, x: 14 }}
-            animate={{ opacity: 1, x: 0 }}
             className={clsx(
               "glass-card self-start overflow-hidden",
               isEvicted(focusedPlayer) && "border-status-error/50",
@@ -473,10 +463,8 @@ export default function App() {
                       <span className="font-bold">{rating.rating}</span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-neutral-bg4">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${rating.rating * 10}%` }}
-                        transition={{ duration: 0.5, ease: "easeOut" }}
+                      <div
+                        style={{ width: `${rating.rating * 10}%` }}
                         className="h-full rounded-full bg-gradient-to-r from-brand to-cyan-400"
                       />
                     </div>
@@ -487,7 +475,11 @@ export default function App() {
               <div className="mt-6 grid grid-cols-2 gap-3 border-t border-border-subtle pt-5">
                 <DetailStat
                   label="Stock price"
-                  value={focusedSummary ? `$${focusedSummary.price}` : "—"}
+                  value={
+                    focusedSummary?.price
+                      ? `$${focusedSummary.price}`
+                      : "Unavailable"
+                  }
                 />
                 <DetailStat
                   label="Weekly move"
@@ -505,7 +497,7 @@ export default function App() {
                 />
               </div>
             </div>
-          </motion.aside>
+          </aside>
         </div>
 
         <footer className="mt-8 flex flex-col gap-2 border-t border-border-subtle py-6 text-xs text-text-muted sm:flex-row sm:justify-between">
@@ -540,10 +532,7 @@ function StatCard({
   accent?: boolean;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -2 }}
+    <div
       className={clsx(
         "glass-card p-5",
         accent && "border-brand/30 bg-brand/10 shadow-glow",
@@ -554,7 +543,7 @@ function StatCard({
       </p>
       <p className="mt-2 text-2xl font-bold">{value}</p>
       <p className="mt-1 text-sm text-text-secondary">{detail}</p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -566,15 +555,13 @@ function ControlButton({
   onClick: () => void;
 }) {
   return (
-    <motion.button
+    <button
       type="button"
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.97 }}
       onClick={onClick}
       className="min-h-touch rounded-lg border border-border bg-neutral-bg3 px-4 text-sm font-semibold text-text-secondary transition-colors hover:bg-neutral-bg4 hover:text-white"
     >
       {children}
-    </motion.button>
+    </button>
   );
 }
 

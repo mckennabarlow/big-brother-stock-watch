@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { motion } from "framer-motion";
 import type { Metric, Player, WeeklySummary } from "../types";
 
 const COLORS = [
@@ -52,9 +51,11 @@ export function SeasonChart({
   const visible = players.filter((player) =>
     visiblePlayerIds.has(player.player_id),
   );
-  const values = summaries.map((row) =>
-    metric === "rating" ? Number(row.average_rating) : Number(row.price),
-  );
+  const values = summaries
+    .filter((row) => metric === "rating" || row.price !== "")
+    .map((row) =>
+      metric === "rating" ? Number(row.average_rating) : Number(row.price),
+    );
   const yMin = metric === "rating" ? 1 : 0;
   const yMax =
     metric === "rating"
@@ -158,7 +159,8 @@ export function SeasonChart({
               (row) =>
                 row.player_id === player.player_id &&
                 (!player.eviction_week ||
-                  row.week <= player.eviction_week),
+                  row.week <= player.eviction_week) &&
+                (metric === "rating" || row.price !== ""),
             )
             .sort((left, right) => left.week - right.week);
           const points = rows.map((row) => ({
@@ -180,28 +182,26 @@ export function SeasonChart({
                 `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`,
             )
             .join(" ");
+          if (points.length === 0) {
+            return null;
+          }
           const color = playerColor(player.player_id, players);
           const focused = focusedPlayerId === player.player_id;
 
           return (
-            <motion.g
+            <g
               key={`${metric}-${player.player_id}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: focused ? 1 : 0.72 }}
-              transition={{ duration: 0.25 }}
+              opacity={focused ? 1 : 0.72}
               className="cursor-pointer"
               onClick={() => onFocusPlayer(player.player_id)}
             >
-              <motion.path
+              <path
                 d={path}
                 fill="none"
                 stroke={color}
                 strokeWidth={focused ? 5 : 3}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.65, ease: "easeOut" }}
               />
               {points.map((point) => (
                 <circle
@@ -221,7 +221,7 @@ export function SeasonChart({
                   </title>
                 </circle>
               ))}
-            </motion.g>
+            </g>
           );
         })}
       </svg>

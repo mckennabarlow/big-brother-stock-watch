@@ -7,7 +7,7 @@
     "current_week": 3,
     "closes_at": "2026-08-03T20:00:00.000000Z",
     "source": "https://realitystockwatch.com/trades",
-    "extracted_at": "2026-08-03T20:32:50.677Z"
+    "extracted_at": "2026-08-03T21:25:07.418Z"
   },
   "players": [
     {
@@ -20,6 +20,17 @@
       "status": "active",
       "eviction_week": null,
       "image_url": "https://realitystockwatch.com/storage//houseguests/bb28/angela-murray.png"
+    },
+    {
+      "season": "bb28",
+      "player_id": 178,
+      "first_name": "Ashley",
+      "last_name": "Trail",
+      "nickname": "Ashley",
+      "slug": "ashley",
+      "status": "evicted",
+      "eviction_week": 1,
+      "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/ashley-trail.png"
     },
     {
       "season": "bb28",
@@ -155,6 +166,17 @@
     },
     {
       "season": "bb28",
+      "player_id": 189,
+      "first_name": "Rome",
+      "last_name": "Seymour",
+      "nickname": "Rome",
+      "slug": "rome",
+      "status": "evicted",
+      "eviction_week": 2,
+      "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/rome-seymour.png"
+    },
+    {
+      "season": "bb28",
       "player_id": 190,
       "first_name": "Taylor",
       "last_name": "Brown",
@@ -220,10 +242,58 @@
       "player_slug": "angela",
       "player_name": "Angela",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 7,
       "recorded_at": "2026-07-15T03:20:39.000000Z"
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 178,
+      "player_slug": "ashley",
+      "player_name": "Ashley",
+      "rater_id": 1,
+      "rater_name": "Audience",
+      "rater_role": "audience",
+      "rating": 3,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 178,
+      "player_slug": "ashley",
+      "player_name": "Ashley",
+      "rater_id": 4,
+      "rater_name": "Taran Armstrong",
+      "rater_role": "host",
+      "rating": 3,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 178,
+      "player_slug": "ashley",
+      "player_name": "Ashley",
+      "rater_id": 9,
+      "rater_name": "Melissa Deni",
+      "rater_role": "host",
+      "rating": 3,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 178,
+      "player_slug": "ashley",
+      "player_name": "Ashley",
+      "rater_id": 7620,
+      "rater_name": "Aysha Welch",
+      "rater_role": "guest",
+      "rating": 3,
+      "recorded_at": null
     },
     {
       "season": "bb28",
@@ -268,7 +338,7 @@
       "player_slug": "barrett",
       "player_name": "Barrett",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 8,
       "recorded_at": "2026-07-15T03:20:49.000000Z"
@@ -316,7 +386,7 @@
       "player_slug": "chuk",
       "player_name": "Chuk",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 5,
       "recorded_at": "2026-07-15T03:20:55.000000Z"
@@ -364,7 +434,7 @@
       "player_slug": "dee",
       "player_name": "Dee",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 9,
       "recorded_at": "2026-07-15T03:21:03.000000Z"
@@ -412,7 +482,7 @@
       "player_slug": "devens",
       "player_name": "Devens",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 7,
       "recorded_at": "2026-07-15T03:21:07.000000Z"
@@ -460,7 +530,7 @@
       "player_slug": "drew",
       "player_name": "Drew",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 6,
       "recorded_at": "2026-07-15T03:21:11.000000Z"
@@ -508,7 +578,7 @@
       "player_slug": "haley",
       "player_name": "Haley",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 2,
       "recorded_at": "2026-07-15T03:21:28.000000Z"
@@ -556,7 +626,7 @@
       "player_slug": "jason",
       "player_name": "Jason",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-15T03:21:35.000000Z"
@@ -604,7 +674,7 @@
       "player_slug": "kamu",
       "player_name": "Kamu",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-15T03:21:41.000000Z"
@@ -652,7 +722,7 @@
       "player_slug": "latrice",
       "player_name": "LaTrice",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-15T03:21:49.000000Z"
@@ -700,7 +770,7 @@
       "player_slug": "lyric",
       "player_name": "Lyric",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-15T03:22:02.000000Z"
@@ -748,7 +818,7 @@
       "player_slug": "mallory",
       "player_name": "Mallory",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 5,
       "recorded_at": "2026-07-15T03:22:17.000000Z"
@@ -796,10 +866,58 @@
       "player_slug": "melody",
       "player_name": "Melody",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-15T03:22:24.000000Z"
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "rater_id": 1,
+      "rater_name": "Audience",
+      "rater_role": "audience",
+      "rating": 5,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "rater_id": 4,
+      "rater_name": "Taran Armstrong",
+      "rater_role": "host",
+      "rating": 4,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "rater_id": 9,
+      "rater_name": "Melissa Deni",
+      "rater_role": "host",
+      "rating": 5,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "rater_id": 7620,
+      "rater_name": "Aysha Welch",
+      "rater_role": "guest",
+      "rating": 5,
+      "recorded_at": null
     },
     {
       "season": "bb28",
@@ -844,7 +962,7 @@
       "player_slug": "taylor",
       "player_name": "Taylor",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-15T03:22:39.000000Z"
@@ -892,7 +1010,7 @@
       "player_slug": "yash",
       "player_name": "Yash",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Aysha Welch",
       "rater_role": "guest",
       "rating": 2,
       "recorded_at": "2026-07-15T03:22:50.000000Z"
@@ -940,7 +1058,7 @@
       "player_slug": "angela",
       "player_name": "Angela",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 5,
       "recorded_at": "2026-07-21T04:57:51.000000Z"
@@ -988,7 +1106,7 @@
       "player_slug": "barrett",
       "player_name": "Barrett",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 5,
       "recorded_at": "2026-07-21T04:57:52.000000Z"
@@ -1036,7 +1154,7 @@
       "player_slug": "chuk",
       "player_name": "Chuk",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-21T04:57:56.000000Z"
@@ -1084,7 +1202,7 @@
       "player_slug": "dee",
       "player_name": "Dee",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 7,
       "recorded_at": "2026-07-21T04:57:55.000000Z"
@@ -1132,7 +1250,7 @@
       "player_slug": "devens",
       "player_name": "Devens",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-21T04:57:56.000000Z"
@@ -1180,7 +1298,7 @@
       "player_slug": "drew",
       "player_name": "Drew",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 6,
       "recorded_at": "2026-07-21T04:57:59.000000Z"
@@ -1228,7 +1346,7 @@
       "player_slug": "haley",
       "player_name": "Haley",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-21T04:58:00.000000Z"
@@ -1276,7 +1394,7 @@
       "player_slug": "jason",
       "player_name": "Jason",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 3,
       "recorded_at": "2026-07-21T04:58:01.000000Z"
@@ -1324,7 +1442,7 @@
       "player_slug": "kamu",
       "player_name": "Kamu",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 6,
       "recorded_at": "2026-07-21T04:58:02.000000Z"
@@ -1372,7 +1490,7 @@
       "player_slug": "latrice",
       "player_name": "LaTrice",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 3,
       "recorded_at": "2026-07-21T04:58:04.000000Z"
@@ -1420,7 +1538,7 @@
       "player_slug": "lyric",
       "player_name": "Lyric",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 5,
       "recorded_at": "2026-07-21T04:58:06.000000Z"
@@ -1468,7 +1586,7 @@
       "player_slug": "mallory",
       "player_name": "Mallory",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-21T04:58:06.000000Z"
@@ -1516,10 +1634,58 @@
       "player_slug": "melody",
       "player_name": "Melody",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-21T04:58:06.000000Z"
+    },
+    {
+      "season": "bb28",
+      "week": 2,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "rater_id": 1,
+      "rater_name": "Audience",
+      "rater_role": "audience",
+      "rating": 3,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 2,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "rater_id": 4,
+      "rater_name": "Taran Armstrong",
+      "rater_role": "host",
+      "rating": 2,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 2,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "rater_id": 9,
+      "rater_name": "Melissa Deni",
+      "rater_role": "host",
+      "rating": 2,
+      "recorded_at": null
+    },
+    {
+      "season": "bb28",
+      "week": 2,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "rater_id": 7620,
+      "rater_name": "Pooya",
+      "rater_role": "guest",
+      "rating": 2,
+      "recorded_at": null
     },
     {
       "season": "bb28",
@@ -1564,7 +1730,7 @@
       "player_slug": "taylor",
       "player_name": "Taylor",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 4,
       "recorded_at": "2026-07-21T04:58:16.000000Z"
@@ -1612,7 +1778,7 @@
       "player_slug": "yash",
       "player_name": "Yash",
       "rater_id": 7620,
-      "rater_name": "Guest (user 7620)",
+      "rater_name": "Pooya",
       "rater_role": "guest",
       "rating": 2,
       "recorded_at": "2026-07-21T04:58:18.000000Z"
@@ -2760,6 +2926,17 @@
     {
       "season": "bb28",
       "week": 1,
+      "player_id": 178,
+      "player_slug": "ashley",
+      "player_name": "Ashley",
+      "average_rating": "3.00",
+      "rounded_rating": 3,
+      "rating_count": 4,
+      "price": ""
+    },
+    {
+      "season": "bb28",
+      "week": 1,
       "player_id": 179,
       "player_slug": "barrett",
       "player_name": "Barrett",
@@ -2888,6 +3065,17 @@
       "rounded_rating": 4,
       "rating_count": 4,
       "price": "4.00"
+    },
+    {
+      "season": "bb28",
+      "week": 1,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "average_rating": "4.75",
+      "rounded_rating": 5,
+      "rating_count": 4,
+      "price": ""
     },
     {
       "season": "bb28",
@@ -3053,6 +3241,17 @@
       "rounded_rating": 4,
       "rating_count": 4,
       "price": "3.82"
+    },
+    {
+      "season": "bb28",
+      "week": 2,
+      "player_id": 189,
+      "player_slug": "rome",
+      "player_name": "Rome",
+      "average_rating": "2.25",
+      "rounded_rating": 2,
+      "rating_count": 4,
+      "price": ""
     },
     {
       "season": "bb28",

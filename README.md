@@ -62,6 +62,10 @@ the dashboard to GitHub Pages.
 Add verified week-specific guest names to `config\rater-overrides.json`, then
 rerun the extractor.
 
+Ratings for players removed from the live Reality Stock Watch payload can be
+preserved in `config\historical-overrides.json`. Missing stock prices remain
+blank rather than being estimated.
+
 ## Data policy
 
 Raw snapshots are retained so every processed value can be traced back to its

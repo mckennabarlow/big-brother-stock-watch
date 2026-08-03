@@ -1,5 +1,6 @@
 season,week,player_id,player_slug,player_name,average_rating,rounded_rating,rating_count,price
 bb28,1,192,angela,Angela,7.00,7,4,7.00
+bb28,1,178,ashley,Ashley,3.00,3,4,
 bb28,1,179,barrett,Barrett,7.25,7,4,7.00
 bb28,1,180,chuk,Chuk,4.75,5,4,5.00
 bb28,1,194,dee,Dee,8.75,9,4,9.00
@@ -12,6 +13,7 @@ bb28,1,185,latrice,LaTrice,4.50,5,4,5.00
 bb28,1,186,lyric,Lyric,4.50,5,4,5.00
 bb28,1,187,mallory,Mallory,4.50,5,4,5.00
 bb28,1,188,melody,Melody,4.00,4,4,4.00
+bb28,1,189,rome,Rome,4.75,5,4,
 bb28,1,190,taylor,Taylor,3.50,4,4,4.00
 bb28,1,191,yash,Yash,2.00,2,4,2.00
 bb28,2,192,angela,Angela,5.50,6,4,7.05
@@ -27,6 +29,7 @@ bb28,2,185,latrice,LaTrice,3.50,4,4,4.00
 bb28,2,186,lyric,Lyric,5.75,6,4,6.00
 bb28,2,187,mallory,Mallory,4.25,4,4,4.00
 bb28,2,188,melody,Melody,3.50,4,4,3.82
+bb28,2,189,rome,Rome,2.25,2,4,
 bb28,2,190,taylor,Taylor,4.00,4,4,3.82
 bb28,2,191,yash,Yash,2.75,3,4,2.18
 bb28,3,192,angela,Angela,5.25,5,4,5.92

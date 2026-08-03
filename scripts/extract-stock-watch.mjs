@@ -75,6 +75,18 @@ async function loadOverrides() {
   }
 }
 
+async function loadHistoricalOverrides() {
+  const path = join(PROJECT_ROOT, "config", "historical-overrides.json");
+  try {
+    return JSON.parse(await readFile(path, "utf8"));
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return {};
+    }
+    throw error;
+  }
+}
+
 function identifyRater(userId, seasonSlug, week, overrides) {
   if (RATER_ROLES.has(userId)) {
     return RATER_ROLES.get(userId);
@@ -220,6 +232,92 @@ function normalize(season, source, extractedAt, overrides) {
   };
 }
 
+function applyHistoricalOverrides(data, historicalOverrides, raterOverrides) {
+  const season = historicalOverrides[data.metadata.slug];
+  if (!season) {
+    return data;
+  }
+
+  for (const historicalPlayer of season.players ?? []) {
+    const player = {
+      season: data.metadata.slug,
+      player_id: historicalPlayer.player_id,
+      first_name: historicalPlayer.first_name,
+      last_name: historicalPlayer.last_name,
+      nickname: historicalPlayer.nickname,
+      slug: historicalPlayer.slug,
+      status: historicalPlayer.status,
+      eviction_week: historicalPlayer.eviction_week,
+      image_url: historicalPlayer.image_url,
+    };
+    const playerIndex = data.players.findIndex(
+      (item) => item.player_id === player.player_id,
+    );
+    if (playerIndex >= 0) {
+      data.players[playerIndex] = player;
+    } else {
+      data.players.push(player);
+    }
+
+    for (const weekly of historicalPlayer.weeks ?? []) {
+      const values = [];
+      for (const [userIdText, rating] of Object.entries(weekly.ratings)) {
+        const userId = Number(userIdText);
+        const [raterName, raterRole] = identifyRater(
+          userId,
+          data.metadata.slug,
+          weekly.week,
+          raterOverrides,
+        );
+        values.push(Number(rating));
+        data.ratings.push({
+          season: data.metadata.slug,
+          week: weekly.week,
+          player_id: player.player_id,
+          player_slug: player.slug,
+          player_name: player.nickname || player.first_name,
+          rater_id: userId,
+          rater_name: raterName,
+          rater_role: raterRole,
+          rating: Number(rating),
+          recorded_at: null,
+        });
+      }
+
+      const average =
+        values.reduce((sum, value) => sum + value, 0) / values.length;
+      data.summaries.push({
+        season: data.metadata.slug,
+        week: weekly.week,
+        player_id: player.player_id,
+        player_slug: player.slug,
+        player_name: player.nickname || player.first_name,
+        average_rating: average.toFixed(2),
+        rounded_rating: Math.round(average),
+        rating_count: values.length,
+        price: "",
+      });
+    }
+  }
+
+  data.players = mergeRows(
+    [],
+    data.players,
+    (player) => String(player.player_id),
+  );
+  data.ratings = mergeRows(
+    [],
+    data.ratings,
+    (row) => `${row.week}:${row.player_id}:${row.rater_id}`,
+  );
+  data.summaries = mergeRows(
+    [],
+    data.summaries,
+    (row) => `${row.week}:${row.player_id}`,
+  );
+  return data;
+}
+
 async function loadExistingDataset(outputDirectory) {
   try {
     return JSON.parse(
@@ -252,7 +350,8 @@ function preserveEvictedPlayers(current, previous) {
   for (const previousPlayer of previous.players ?? []) {
     const currentPlayer = currentPlayers.get(previousPlayer.player_id);
     if (currentPlayer) {
-      currentPlayer.eviction_week = previousPlayer.eviction_week ?? null;
+      currentPlayer.eviction_week =
+        currentPlayer.eviction_week ?? previousPlayer.eviction_week ?? null;
       continue;
     }
 
@@ -423,12 +522,17 @@ async function main() {
     "processed",
     season.short_name,
   );
+  const raterOverrides = await loadOverrides();
   const data = preserveEvictedPlayers(
-    normalize(
-      season,
-      source,
-      extractedAt,
-      await loadOverrides(),
+    applyHistoricalOverrides(
+      normalize(
+        season,
+        source,
+        extractedAt,
+        raterOverrides,
+      ),
+      await loadHistoricalOverrides(),
+      raterOverrides,
     ),
     await loadExistingDataset(outputDirectory),
   );
