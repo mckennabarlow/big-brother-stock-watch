@@ -41,6 +41,10 @@ function formatMetric(value: number, metric: Metric) {
   return metric === "price" ? `$${value.toFixed(2)}` : value.toFixed(2);
 }
 
+function formatChange(value: number, metric: Metric) {
+  return `${value >= 0 ? "+" : "−"}${formatMetric(Math.abs(value), metric)}`;
+}
+
 export default function DraftDashboard({
   dataset,
   weeks,
@@ -117,6 +121,129 @@ export default function DraftDashboard({
       cumulativeValue: values.reduce((sum, value) => sum + value, 0),
     };
   });
+  const previousWeek = weeks.filter((week) => week < selectedWeek).at(-1);
+  const teamWeeklyValues = weeks
+    .filter((week) => week <= selectedWeek)
+    .map((week) => ({
+      week,
+      value: selectedTeam.players.reduce((sum, player) => {
+        if (
+          player.eviction_week !== null &&
+          week > player.eviction_week
+        ) {
+          return sum;
+        }
+        const row = dataset.summaries.find(
+          (summary) =>
+            summary.player_id === player.player_id &&
+            summary.week === week &&
+            (metric === "rating" || summary.price !== ""),
+        );
+        return row ? sum + metricValue(row, metric) : sum;
+      }, 0),
+    }));
+  const currentTeamValue =
+    teamWeeklyValues.find((item) => item.week === selectedWeek)?.value ?? 0;
+  const previousTeamValue =
+    previousWeek === undefined
+      ? null
+      : (teamWeeklyValues.find((item) => item.week === previousWeek)?.value ??
+        0);
+  const teamChange =
+    previousTeamValue === null ? null : currentTeamValue - previousTeamValue;
+  const playerChanges =
+    previousWeek === undefined
+      ? []
+      : selectedTeam.players
+          .map((player) => {
+            const current = dataset.summaries.find(
+              (row) =>
+                row.player_id === player.player_id &&
+                row.week === selectedWeek &&
+                (metric === "rating" || row.price !== ""),
+            );
+            const previous = dataset.summaries.find(
+              (row) =>
+                row.player_id === player.player_id &&
+                row.week === previousWeek &&
+                (metric === "rating" || row.price !== ""),
+            );
+            if (!current || !previous) {
+              return null;
+            }
+            return {
+              player,
+              current: metricValue(current, metric),
+              previous: metricValue(previous, metric),
+              change:
+                metricValue(current, metric) -
+                metricValue(previous, metric),
+            };
+          })
+          .filter(
+            (
+              item,
+            ): item is {
+              player: Player;
+              current: number;
+              previous: number;
+              change: number;
+            } => item !== null,
+          )
+          .sort(
+            (left, right) =>
+              Math.abs(right.change) - Math.abs(left.change),
+          );
+  const biggestPlayerChange = playerChanges[0] ?? null;
+  const leadingDrivers = playerChanges
+    .filter((item) =>
+      teamChange === null || teamChange === 0
+        ? item.change !== 0
+        : Math.sign(item.change) === Math.sign(teamChange),
+    )
+    .slice(0, 2);
+  const weeklyChanges = teamWeeklyValues.slice(1).map((item, index) => ({
+    week: item.week,
+    change: item.value - teamWeeklyValues[index].value,
+  }));
+  const recentChanges = weeklyChanges.slice(-2);
+  const trend =
+    recentChanges.length === 0
+      ? {
+          label: "Opening week",
+          detail: "More weeks are needed to establish a trend.",
+        }
+      : recentChanges.every((item) => item.change > 0)
+        ? {
+            label: "Trending up",
+            detail: `${selectedTeam.name} has gained in ${recentChanges.length} consecutive week${recentChanges.length === 1 ? "" : "s"}.`,
+          }
+        : recentChanges.every((item) => item.change < 0)
+          ? {
+              label: "Trending down",
+              detail: `${selectedTeam.name} has declined in ${recentChanges.length} consecutive week${recentChanges.length === 1 ? "" : "s"}.`,
+            }
+          : {
+              label: "Mixed momentum",
+              detail: "Recent weekly movement has changed direction.",
+            };
+  const activePlayers = selectedTeam.players.filter(
+    (player) => !isEvicted(player),
+  );
+  const evictedPlayers = selectedTeam.players.filter(isEvicted);
+  const movementExplanation =
+    teamChange === null
+      ? "This is the opening week, so there is no prior result to compare."
+      : teamChange === 0
+        ? "The team's combined result was unchanged from the previous week."
+        : leadingDrivers.length > 0
+          ? `${teamChange > 0 ? "The gain was led by" : "The decline was driven by"} ${leadingDrivers
+              .map(
+                (item) =>
+                  `${playerName(item.player)} (${formatChange(item.change, metric)})`,
+              )
+              .join(" and ")}.`
+          : "Roster changes account for most of the week-over-week movement.";
 
   return (
     <div className="space-y-6">
@@ -434,6 +561,82 @@ export default function DraftDashboard({
           </div>
         </div>
       </section>
+
+      <section className="glass-card overflow-hidden p-4 sm:p-6">
+        <div className="mb-5">
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-light">
+            Data-driven insights
+          </p>
+          <h2 className="mt-1 text-2xl font-bold">
+            {selectedTeam.name} team insights
+          </h2>
+          <p className="mt-1 text-sm text-text-secondary">
+            What changed through Week {selectedWeek} and which players drove
+            the movement.
+          </p>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <InsightCard
+            label="Team movement"
+            value={
+              teamChange === null
+                ? "Opening week"
+                : formatChange(teamChange, metric)
+            }
+            detail={movementExplanation}
+            tone={
+              teamChange === null || teamChange === 0
+                ? "neutral"
+                : teamChange > 0
+                  ? "positive"
+                  : "negative"
+            }
+          />
+          <InsightCard
+            label="Biggest player swing"
+            value={
+              biggestPlayerChange
+                ? playerName(biggestPlayerChange.player)
+                : "No comparison"
+            }
+            detail={
+              biggestPlayerChange
+                ? `${formatChange(biggestPlayerChange.change, metric)} from Week ${previousWeek} to Week ${selectedWeek} (${formatMetric(biggestPlayerChange.previous, metric)} → ${formatMetric(biggestPlayerChange.current, metric)}).`
+                : "No player has values in both the current and previous week."
+            }
+            tone={
+              !biggestPlayerChange || biggestPlayerChange.change === 0
+                ? "neutral"
+                : biggestPlayerChange.change > 0
+                  ? "positive"
+                  : "negative"
+            }
+          />
+          <InsightCard
+            label="Trend analysis"
+            value={trend.label}
+            detail={`${trend.detail} Current team total: ${formatMetric(currentTeamValue, metric)}.`}
+            tone={
+              trend.label === "Trending up"
+                ? "positive"
+                : trend.label === "Trending down"
+                  ? "negative"
+                  : "neutral"
+            }
+          />
+          <InsightCard
+            label="Roster health"
+            value={`${activePlayers.length} of ${selectedTeam.players.length} active`}
+            detail={
+              evictedPlayers.length
+                ? `Out: ${evictedPlayers.map(playerName).join(", ")}.`
+                : "The full drafted roster remains in the house."
+            }
+            tone={evictedPlayers.length ? "negative" : "positive"}
+          />
+        </div>
+      </section>
     </div>
   );
 }
@@ -461,5 +664,38 @@ function TeamMetric({
         {value}
       </p>
     </div>
+  );
+}
+
+function InsightCard({
+  label,
+  value,
+  detail,
+  tone,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+  tone: "positive" | "negative" | "neutral";
+}) {
+  return (
+    <article className="rounded-xl border border-border-subtle bg-neutral-bg3 p-4">
+      <p className="text-[10px] font-black uppercase tracking-[0.16em] text-text-muted">
+        {label}
+      </p>
+      <p
+        className={clsx(
+          "mt-2 text-xl font-bold",
+          tone === "positive" && "text-status-success",
+          tone === "negative" && "text-status-error",
+          tone === "neutral" && "text-text-primary",
+        )}
+      >
+        {value}
+      </p>
+      <p className="mt-2 text-sm leading-relaxed text-text-secondary">
+        {detail}
+      </p>
+    </article>
   );
 }
