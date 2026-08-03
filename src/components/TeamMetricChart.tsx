@@ -29,7 +29,7 @@ export function TeamMetricChart({
   const scrollContainer = useRef<HTMLDivElement>(null);
   const width = 980;
   const height = 410;
-  const padding = { top: 28, right: 42, bottom: 48, left: 64 };
+  const padding = { top: 28, right: 64, bottom: 48, left: 64 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
   const series = teams.map((team, teamIndex) => {
@@ -156,6 +156,15 @@ export function TeamMetricChart({
                 x={padding.left - 14}
                 y={y(tick) + 4}
                 textAnchor="end"
+                fill="#77778A"
+                fontSize="12"
+              >
+                {metric === "price" ? `$${tick}` : tick}
+              </text>
+              <text
+                x={width - padding.right + 14}
+                y={y(tick) + 4}
+                textAnchor="start"
                 fill="#77778A"
                 fontSize="12"
               >

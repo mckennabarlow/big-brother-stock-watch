@@ -44,7 +44,7 @@ export function SeasonChart({
   const scrollContainer = useRef<HTMLDivElement>(null);
   const width = 980;
   const height = 450;
-  const padding = { top: 26, right: 36, bottom: 48, left: 58 };
+  const padding = { top: 26, right: 58, bottom: 48, left: 58 };
   const weeks = [...new Set(summaries.map((row) => row.week))].sort(
     (left, right) => left - right,
   );
@@ -123,6 +123,15 @@ export function SeasonChart({
               x={padding.left - 14}
               y={y(tick) + 4}
               textAnchor="end"
+              fill="#77778A"
+              fontSize="12"
+            >
+              {metric === "price" ? `$${tick}` : tick}
+            </text>
+            <text
+              x={width - padding.right + 14}
+              y={y(tick) + 4}
+              textAnchor="start"
               fill="#77778A"
               fontSize="12"
             >
