@@ -7,6 +7,7 @@ interface PlayerAvatarProps {
   className?: string;
   ringColor?: string;
   square?: boolean;
+  evicted?: boolean;
 }
 
 export function PlayerAvatar({
@@ -14,6 +15,7 @@ export function PlayerAvatar({
   className,
   ringColor,
   square = false,
+  evicted = false,
 }: PlayerAvatarProps) {
   const [failed, setFailed] = useState(false);
   const name = player.nickname || player.first_name;
@@ -35,11 +37,21 @@ export function PlayerAvatar({
         <img
           src={player.image_url}
           alt={`${name} ${player.last_name}`}
-          className="h-full w-full object-cover object-top"
+          className={clsx(
+            "h-full w-full object-cover object-top",
+            evicted && "grayscale",
+          )}
           loading="lazy"
           referrerPolicy="no-referrer"
           onError={() => setFailed(true)}
         />
+      )}
+      {evicted && (
+        <div className="absolute inset-0 bg-neutral-bg1/35">
+          <span className="absolute bottom-0.5 right-0.5 rounded-full bg-status-error px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-white">
+            Out
+          </span>
+        </div>
       )}
     </div>
   );

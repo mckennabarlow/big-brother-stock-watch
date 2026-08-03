@@ -17,6 +17,10 @@ function playerName(player: Player) {
   return player.nickname || player.first_name;
 }
 
+function isEvicted(player: Player) {
+  return player.status !== "active" || player.eviction_week !== null;
+}
+
 function metricValue(row: WeeklySummary, metric: Metric) {
   return metric === "rating" ? Number(row.average_rating) : Number(row.price);
 }
@@ -251,6 +255,7 @@ export default function App() {
           <div className="-mx-4 mb-4 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
             {dataset.players.map((player) => {
               const active = visiblePlayerIds.has(player.player_id);
+              const evicted = isEvicted(player);
               const color = playerColor(player.player_id, dataset.players);
               return (
                 <motion.button
@@ -262,14 +267,19 @@ export default function App() {
                   className={clsx(
                     "flex min-h-touch shrink-0 items-center gap-2 rounded-full border px-2.5 py-1.5 text-sm font-medium transition-colors",
                     active
-                      ? "border-border-strong bg-neutral-bg4 text-white"
+                      ? evicted
+                        ? "border-status-error/70 bg-status-error/10 text-white"
+                        : "border-border-strong bg-neutral-bg4 text-white"
                       : "border-border-subtle bg-neutral-bg2/60 text-text-muted",
                   )}
                 >
                   <PlayerAvatar
                     player={player}
                     className="h-7 w-7"
-                    ringColor={active ? color : undefined}
+                    ringColor={
+                      active ? (evicted ? "#FB7185" : color) : undefined
+                    }
+                    evicted={evicted}
                   />
                   {playerName(player)}
                 </motion.button>
@@ -340,6 +350,7 @@ export default function App() {
                   metric,
                 );
                 const color = playerColor(player.player_id, dataset.players);
+                const evicted = isEvicted(player);
                 return (
                   <motion.button
                     type="button"
@@ -353,7 +364,9 @@ export default function App() {
                     className={clsx(
                       "flex min-h-[76px] items-center gap-3 rounded-xl border p-3 text-left transition-colors",
                       focusedPlayerId === row.player_id
-                        ? "border-brand/50 bg-brand/10"
+                        ? evicted
+                          ? "border-status-error/60 bg-status-error/10"
+                          : "border-brand/50 bg-brand/10"
                         : "border-border-subtle bg-neutral-bg2/55 hover:border-border",
                     )}
                   >
@@ -363,7 +376,8 @@ export default function App() {
                     <PlayerAvatar
                       player={player}
                       className="h-12 w-12"
-                      ringColor={color}
+                      ringColor={evicted ? "#FB7185" : color}
+                      evicted={evicted}
                     />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-semibold">
@@ -399,7 +413,10 @@ export default function App() {
             key={`${focusedPlayerId}-${selectedWeek}`}
             initial={{ opacity: 0, x: 14 }}
             animate={{ opacity: 1, x: 0 }}
-            className="glass-card self-start overflow-hidden"
+            className={clsx(
+              "glass-card self-start overflow-hidden",
+              isEvicted(focusedPlayer) && "border-status-error/50",
+            )}
           >
             <div className="relative h-52 overflow-hidden border-b border-border-subtle bg-neutral-bg3">
               <div
@@ -415,6 +432,7 @@ export default function App() {
                 player={focusedPlayer}
                 className="absolute bottom-0 left-1/2 h-48 w-48 -translate-x-1/2 bg-transparent"
                 square
+                evicted={isEvicted(focusedPlayer)}
               />
               <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-neutral-bg2 to-transparent" />
             </div>
@@ -422,7 +440,9 @@ export default function App() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-brand-light">
-                    Week {selectedWeek} breakdown
+                    {isEvicted(focusedPlayer)
+                      ? `Evicted after week ${focusedPlayer.eviction_week ?? "—"}`
+                      : `Week ${selectedWeek} breakdown`}
                   </p>
                   <h2 className="mt-1 text-2xl font-bold">
                     {playerName(focusedPlayer)}

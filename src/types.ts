@@ -17,6 +17,7 @@ export interface Player {
   nickname: string;
   slug: string;
   status: string;
+  eviction_week: number | null;
   image_url: string;
 }
 

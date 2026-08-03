@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import type { Metric, Player, WeeklySummary } from "../types";
 
@@ -41,6 +42,7 @@ export function SeasonChart({
   focusedPlayerId,
   onFocusPlayer,
 }: SeasonChartProps) {
+  const scrollContainer = useRef<HTMLDivElement>(null);
   const width = 980;
   const height = 450;
   const padding = { top: 26, right: 36, bottom: 48, left: 58 };
@@ -73,8 +75,19 @@ export function SeasonChart({
     (_, index) => yMin + index * tickStep,
   );
 
+  useEffect(() => {
+    const container = scrollContainer.current;
+    if (!container) {
+      return;
+    }
+    container.scrollTo({ left: container.scrollWidth, behavior: "instant" });
+  }, [metric, weeks.length]);
+
   return (
-    <div className="-mx-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+    <div
+      ref={scrollContainer}
+      className="-mx-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"
+    >
       <svg
         viewBox={`0 0 ${width} ${height}`}
         className="w-full min-w-[720px]"
@@ -141,7 +154,12 @@ export function SeasonChart({
 
         {visible.map((player) => {
           const rows = summaries
-            .filter((row) => row.player_id === player.player_id)
+            .filter(
+              (row) =>
+                row.player_id === player.player_id &&
+                (!player.eviction_week ||
+                  row.week <= player.eviction_week),
+            )
             .sort((left, right) => left.week - right.week);
           const points = rows.map((row) => ({
             x: x(row.week),

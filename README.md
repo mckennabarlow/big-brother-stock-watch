@@ -37,6 +37,10 @@ files under `data/processed/<season>/`:
 - `weekly_summary.csv`: averaged rating and price by player/week
 - `validation.json`: completeness and data-quality checks
 
+Each refresh merges with the previous `dataset.json`. If a houseguest
+disappears from the live source, their historical rows are retained, they are
+marked evicted, and their chart line ends at their final scored week.
+
 To reprocess a saved page without making a network request:
 
 ```powershell

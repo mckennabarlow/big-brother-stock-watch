@@ -112,6 +112,7 @@ function normalize(season, source, extractedAt, overrides) {
       nickname: player.nickname ?? "",
       slug: player.slug,
       status: player.status,
+      eviction_week: null,
       image_url: new URL(player.image_url, DEFAULT_URL).href,
     });
 
@@ -217,6 +218,95 @@ function normalize(season, source, extractedAt, overrides) {
     prices,
     summaries,
   };
+}
+
+async function loadExistingDataset(outputDirectory) {
+  try {
+    return JSON.parse(
+      await readFile(join(outputDirectory, "dataset.json"), "utf8"),
+    );
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
+}
+
+function mergeRows(currentRows, previousRows, keyFor) {
+  const merged = new Map(previousRows.map((row) => [keyFor(row), row]));
+  for (const row of currentRows) {
+    merged.set(keyFor(row), row);
+  }
+  return [...merged.values()];
+}
+
+function preserveEvictedPlayers(current, previous) {
+  if (!previous) {
+    return current;
+  }
+
+  const currentPlayers = new Map(
+    current.players.map((player) => [player.player_id, player]),
+  );
+  for (const previousPlayer of previous.players ?? []) {
+    const currentPlayer = currentPlayers.get(previousPlayer.player_id);
+    if (currentPlayer) {
+      currentPlayer.eviction_week = previousPlayer.eviction_week ?? null;
+      continue;
+    }
+
+    const lastScoredWeek = Math.max(
+      0,
+      ...(previous.summaries ?? [])
+        .filter((row) => row.player_id === previousPlayer.player_id)
+        .map((row) => row.week),
+    );
+    current.players.push({
+      ...previousPlayer,
+      status: "evicted",
+      eviction_week: previousPlayer.eviction_week ?? lastScoredWeek,
+    });
+  }
+
+  current.ratings = mergeRows(
+    current.ratings,
+    previous.ratings ?? [],
+    (row) => `${row.week}:${row.player_id}:${row.rater_id}`,
+  );
+  current.prices = mergeRows(
+    current.prices,
+    previous.prices ?? [],
+    (row) => `${row.week}:${row.player_id}`,
+  );
+  current.summaries = mergeRows(
+    current.summaries,
+    previous.summaries ?? [],
+    (row) => `${row.week}:${row.player_id}`,
+  );
+
+  current.players.sort((left, right) =>
+    (left.nickname || left.first_name).localeCompare(
+      right.nickname || right.first_name,
+      "en",
+      { sensitivity: "base" },
+    ),
+  );
+  current.ratings.sort(
+    (left, right) =>
+      left.week - right.week ||
+      left.player_name.localeCompare(right.player_name) ||
+      left.rater_id - right.rater_id,
+  );
+  current.prices.sort(
+    (left, right) =>
+      left.week - right.week || left.player_name.localeCompare(right.player_name),
+  );
+  current.summaries.sort(
+    (left, right) =>
+      left.week - right.week || left.player_name.localeCompare(right.player_name),
+  );
+  return current;
 }
 
 function validate(data) {
@@ -328,14 +418,21 @@ async function main() {
     );
   }
 
-  const data = normalize(
-    season,
-    source,
-    extractedAt,
-    await loadOverrides(),
+  const outputDirectory = join(
+    args.outputRoot,
+    "processed",
+    season.short_name,
+  );
+  const data = preserveEvictedPlayers(
+    normalize(
+      season,
+      source,
+      extractedAt,
+      await loadOverrides(),
+    ),
+    await loadExistingDataset(outputDirectory),
   );
   const validation = validate(data);
-  const outputDirectory = join(args.outputRoot, "processed", season.short_name);
   await mkdir(outputDirectory, { recursive: true });
 
   await Promise.all([
@@ -364,6 +461,7 @@ async function main() {
         "nickname",
         "slug",
         "status",
+        "eviction_week",
         "image_url",
       ],
       data.players,
