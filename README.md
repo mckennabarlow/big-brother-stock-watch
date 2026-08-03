@@ -65,5 +65,5 @@ rerun the extractor.
 ## Data policy
 
 Raw snapshots are retained so every processed value can be traced back to its
-source. Player images are not downloaded: the dataset stores source URLs until
-image licensing and publication requirements are settled.
+source. The update command creates resized WebP portraits under `public/players`
+for fast mobile delivery while retaining source URLs as browser fallbacks.

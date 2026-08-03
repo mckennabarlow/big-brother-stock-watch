@@ -17,8 +17,18 @@ export function PlayerAvatar({
   square = false,
   evicted = false,
 }: PlayerAvatarProps) {
-  const [failed, setFailed] = useState(false);
   const name = player.nickname || player.first_name;
+  const localImage = `${import.meta.env.BASE_URL}players/${player.season}/${player.slug}.webp`;
+  const [source, setSource] = useState(localImage);
+  const [failed, setFailed] = useState(false);
+
+  function handleImageError() {
+    if (source === localImage) {
+      setSource(player.image_url);
+      return;
+    }
+    setFailed(true);
+  }
 
   return (
     <div
@@ -35,15 +45,16 @@ export function PlayerAvatar({
         </div>
       ) : (
         <img
-          src={player.image_url}
+          src={source}
           alt={`${name} ${player.last_name}`}
           className={clsx(
             "h-full w-full object-cover object-top",
             evicted && "grayscale",
           )}
           loading="lazy"
+          decoding="async"
           referrerPolicy="no-referrer"
-          onError={() => setFailed(true)}
+          onError={handleImageError}
         />
       )}
       {evicted && (
