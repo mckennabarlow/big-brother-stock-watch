@@ -88,7 +88,7 @@ export default function App() {
   );
 
   const [metric, setMetric] = useState<Metric>("rating");
-  const [draftMetric, setDraftMetric] = useState<Metric>("price");
+  const [draftMetric, setDraftMetric] = useState<Metric>("rating");
   const [selectedWeek, setSelectedWeek] = useState(latestWeek);
   const [visiblePlayerIds, setVisiblePlayerIds] =
     useState<Set<number>>(defaultPlayerIds);
