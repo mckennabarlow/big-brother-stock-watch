@@ -114,58 +114,6 @@ export default function App() {
         ),
     [metric, selectedWeek],
   );
-  const leaderboardEntries = useMemo(
-    () =>
-      dataset.players
-        .map((player) => {
-          const current = dataset.summaries.find(
-            (row) =>
-              row.player_id === player.player_id &&
-              row.week === selectedWeek,
-          );
-          const final =
-            player.eviction_week !== null &&
-            selectedWeek > player.eviction_week
-              ? dataset.summaries.find(
-                  (row) =>
-                    row.player_id === player.player_id &&
-                    row.week === player.eviction_week,
-                )
-              : undefined;
-
-          return {
-            player,
-            row: current ?? final ?? null,
-            carriedFinalScore: !current && Boolean(final),
-          };
-        })
-        .sort((left, right) => {
-          const leftCurrent =
-            !left.carriedFinalScore &&
-            left.row !== null &&
-            hasMetricValue(left.row, metric);
-          const rightCurrent =
-            !right.carriedFinalScore &&
-            right.row !== null &&
-            hasMetricValue(right.row, metric);
-          if (leftCurrent !== rightCurrent) {
-            return leftCurrent ? -1 : 1;
-          }
-          if (leftCurrent && rightCurrent) {
-            return (
-              metricValue(right.row!, metric) -
-              metricValue(left.row!, metric)
-            );
-          }
-          if (left.carriedFinalScore !== right.carriedFinalScore) {
-            return left.carriedFinalScore ? -1 : 1;
-          }
-          return playerName(left.player).localeCompare(
-            playerName(right.player),
-          );
-        }),
-    [metric, selectedWeek],
-  );
   const focusedPlayer = dataset.players.find(
     (player) => player.player_id === focusedPlayerId,
   )!;
@@ -444,21 +392,20 @@ export default function App() {
               key={`${metric}-${selectedWeek}`}
               className="grid gap-3 md:grid-cols-2"
             >
-              {leaderboardEntries.map(
-                ({ player, row, carriedFinalScore }, index) => {
-                const hasValue = row !== null && hasMetricValue(row, metric);
-                const change = carriedFinalScore
-                  ? null
-                  : movement(
-                      dataset.summaries,
-                      player.player_id,
-                      selectedWeek,
-                      metric,
-                    );
+              {weekRanking.map((row, index) => {
+                const player = dataset.players.find(
+                  (item) => item.player_id === row.player_id,
+                )!;
+                const change = movement(
+                  dataset.summaries,
+                  player.player_id,
+                  selectedWeek,
+                  metric,
+                );
                 const color = playerColor(player.player_id, dataset.players);
                 const evicted = isEvictedByWeek(player, selectedWeek);
                 const evictedThisWeek =
-                  player.eviction_week === selectedWeek && row !== null;
+                  player.eviction_week === selectedWeek;
                 return (
                   <button
                     type="button"
@@ -474,7 +421,7 @@ export default function App() {
                     )}
                   >
                     <span className="w-6 text-center text-sm font-bold text-text-muted">
-                      {carriedFinalScore || !hasValue ? "—" : index + 1}
+                      {index + 1}
                     </span>
                     <PlayerAvatar
                       player={player}
@@ -489,7 +436,7 @@ export default function App() {
                       <span
                         className={clsx(
                           "mt-1 block text-xs font-semibold",
-                          carriedFinalScore || evictedThisWeek
+                          evictedThisWeek
                             ? "text-status-error"
                             : change === null || change === 0
                             ? "text-text-muted"
@@ -498,26 +445,21 @@ export default function App() {
                               : "text-status-error",
                         )}
                       >
-                        {carriedFinalScore
-                          ? `Evicted W${player.eviction_week} · Final ${metric === "rating" ? "score" : "price"}`
-                          : evictedThisWeek
-                            ? `Evicted this week · Final ${metric === "rating" ? "score" : "price"}`
-                            : change === null
-                              ? "Opening week"
-                              : change === 0
-                                ? "No change"
-                                : `${change > 0 ? "▲" : "▼"} ${formatMetric(Math.abs(change), metric)}`}
+                        {evictedThisWeek
+                          ? `Evicted this week · Final ${metric === "rating" ? "score" : "price"}`
+                          : change === null
+                            ? "Opening week"
+                            : change === 0
+                              ? "No change"
+                              : `${change > 0 ? "▲" : "▼"} ${formatMetric(Math.abs(change), metric)}`}
                       </span>
                     </span>
                     <span className="text-lg font-bold" style={{ color }}>
-                      {hasValue && row
-                        ? formatMetric(metricValue(row, metric), metric)
-                        : "Unavailable"}
+                      {formatMetric(metricValue(row, metric), metric)}
                     </span>
                   </button>
                 );
-              },
-              )}
+              })}
             </div>
           </section>
 
