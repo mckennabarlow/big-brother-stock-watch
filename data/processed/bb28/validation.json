@@ -1,12 +1,13 @@
 {
   "valid": true,
   "player_count": 17,
-  "rating_count": 192,
-  "price_count": 45,
+  "rating_count": 248,
+  "price_count": 59,
   "weeks": [
     1,
     2,
-    3
+    3,
+    4
   ],
   "errors": 0,
   "warnings": 0,

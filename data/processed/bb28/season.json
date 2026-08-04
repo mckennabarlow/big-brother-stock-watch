@@ -2,9 +2,9 @@
   "id": 14,
   "name": "Big Brother 28",
   "slug": "bb28",
-  "status": "closed",
-  "current_week": 3,
-  "closes_at": "2026-08-03T20:00:00.000000Z",
+  "status": "open",
+  "current_week": 4,
+  "closes_at": "2026-08-04T20:00:00.000000Z",
   "source": "https://realitystockwatch.com/trades",
-  "extracted_at": "2026-08-03T21:30:32.297Z"
+  "extracted_at": "2026-08-04T18:36:28.497Z"
 }
