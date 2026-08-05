@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { access, mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
@@ -15,6 +15,7 @@ const datasetPath = join(
   "dataset.json",
 );
 const dataset = JSON.parse(await readFile(datasetPath, "utf8"));
+const force = process.argv.includes("--force");
 const outputDirectory = join(
   PROJECT_ROOT,
   "public",
@@ -25,6 +26,19 @@ const outputDirectory = join(
 await mkdir(outputDirectory, { recursive: true });
 
 for (const player of dataset.players) {
+  const outputPath = join(outputDirectory, `${player.slug}.webp`);
+  if (!force) {
+    try {
+      await access(outputPath);
+      console.log(`${player.nickname || player.first_name}: unchanged`);
+      continue;
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+  }
+
   const response = await fetch(player.image_url, {
     headers: { "User-Agent": "big-brother-stock-watch-data/0.1" },
     signal: AbortSignal.timeout(30_000),
@@ -45,7 +59,7 @@ for (const player of dataset.players) {
     .toBuffer();
 
   await writeFile(
-    join(outputDirectory, `${player.slug}.webp`),
+    outputPath,
     optimized,
   );
   console.log(

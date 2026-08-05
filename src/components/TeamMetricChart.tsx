@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
-import type { Metric, Player, StockWatchDataset } from "../types";
+import {
+  buildTeamSeries,
+  sortedUniqueWeeks,
+  teamAxisBounds,
+  type ChartTeam,
+} from "../lib/chartCalculations";
+import type { Metric, StockWatchDataset } from "../types";
 
 const TEAM_COLORS = ["#A78BFA", "#38BDF8", "#34D399", "#FBBF24", "#FB7185"];
-
-interface ChartTeam {
-  id: string;
-  name: string;
-  players: Player[];
-}
 
 interface TeamMetricChartProps {
   dataset: StockWatchDataset;
@@ -32,52 +32,31 @@ export function TeamMetricChart({
   const padding = { top: 28, right: 64, bottom: 48, left: 64 };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
-  const series = teams.map((team, teamIndex) => {
-    const playersById = new Map(
-      team.players.map((player) => [player.player_id, player]),
-    );
-    const points = weeks.map((week) => {
-      const value = dataset.summaries
-        .filter((row) => {
-          const player = playersById.get(row.player_id);
-          return (
-            player &&
-            row.week === week &&
-            (metric === "rating" || row.price !== "") &&
-            (player.eviction_week === null || week <= player.eviction_week)
-          );
-        })
-        .reduce(
-          (sum, row) =>
-            sum +
-            (metric === "rating"
-              ? Number(row.average_rating)
-              : Number(row.price)),
-          0,
-        );
-
-      return { week, value };
-    });
-
+  const chartWeeks = sortedUniqueWeeks(weeks);
+  const series = buildTeamSeries(
+    dataset.summaries,
+    teams,
+    chartWeeks,
+    metric,
+  ).map((team, teamIndex) => {
     return {
       ...team,
       color: TEAM_COLORS[teamIndex % TEAM_COLORS.length],
-      points,
     };
   });
   const values = series.flatMap((team) =>
     team.points.map((point) => point.value),
   );
-  const yMax = Math.max(10, Math.ceil(Math.max(...values, 10) / 5) * 5);
-  const yTicks = Array.from(
-    { length: yMax / 5 + 1 },
-    (_, index) => index * 5,
-  );
+  const axis = teamAxisBounds(values);
+  const yMax = axis.max;
+  const yTicks = axis.ticks;
   const x = (week: number) =>
     padding.left +
-    (weeks.length === 1
+    (chartWeeks.length === 1
       ? chartWidth / 2
-      : ((week - weeks[0]) / (weeks.at(-1)! - weeks[0])) * chartWidth);
+      : ((week - chartWeeks[0]) /
+          (chartWeeks.at(-1)! - chartWeeks[0])) *
+        chartWidth);
   const y = (value: number) =>
     padding.top + ((yMax - value) / yMax) * chartHeight;
 
@@ -87,7 +66,7 @@ export function TeamMetricChart({
       return;
     }
     container.scrollTo({ left: container.scrollWidth, behavior: "instant" });
-  }, [weeks.length]);
+  }, [chartWeeks.length]);
 
   return (
     <section className="glass-card overflow-hidden p-4 sm:p-6">
@@ -173,7 +152,7 @@ export function TeamMetricChart({
             </g>
           ))}
 
-          {weeks.map((week) => (
+          {chartWeeks.map((week) => (
             <g key={week}>
               <line
                 x1={x(week)}

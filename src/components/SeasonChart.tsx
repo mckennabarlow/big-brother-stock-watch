@@ -1,28 +1,13 @@
 import { useEffect, useRef } from "react";
+import {
+  buildPlayerSeries,
+  playerAxisBounds,
+  playerColor,
+} from "../lib/chartCalculations";
+import { seasonWeeks } from "../lib/metrics";
 import type { Metric, Player, WeeklySummary } from "../types";
 
-const COLORS = [
-  "#A78BFA",
-  "#38BDF8",
-  "#34D399",
-  "#FBBF24",
-  "#FB7185",
-  "#F472B6",
-  "#22D3EE",
-  "#C084FC",
-  "#A3E635",
-  "#FB923C",
-  "#818CF8",
-  "#2DD4BF",
-  "#E879F9",
-  "#FACC15",
-  "#60A5FA",
-];
-
-export function playerColor(playerId: number, players: Player[]) {
-  const index = players.findIndex((player) => player.player_id === playerId);
-  return COLORS[(index < 0 ? playerId : index) % COLORS.length];
-}
+export { playerColor } from "../lib/chartCalculations";
 
 interface SeasonChartProps {
   metric: Metric;
@@ -45,22 +30,17 @@ export function SeasonChart({
   const width = 980;
   const height = 450;
   const padding = { top: 26, right: 58, bottom: 48, left: 58 };
-  const weeks = [...new Set(summaries.map((row) => row.week))].sort(
-    (left, right) => left - right,
-  );
-  const visible = players.filter((player) =>
+  const weeks = seasonWeeks(summaries);
+  const series = buildPlayerSeries(players, summaries, metric);
+  const visible = series.filter(({ player }) =>
     visiblePlayerIds.has(player.player_id),
   );
-  const values = summaries
-    .filter((row) => metric === "rating" || row.price !== "")
-    .map((row) =>
-      metric === "rating" ? Number(row.average_rating) : Number(row.price),
-    );
-  const yMin = metric === "rating" ? 1 : 0;
-  const yMax =
-    metric === "rating"
-      ? 10
-      : Math.max(10, Math.ceil(Math.max(...values, 10) / 2) * 2);
+  const axis = playerAxisBounds(
+    metric,
+    series.flatMap((item) => item.points.map((point) => point.value)),
+  );
+  const yMin = axis.min;
+  const yMax = axis.max;
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
   const x = (week: number) =>
@@ -70,11 +50,7 @@ export function SeasonChart({
       : ((week - weeks[0]) / (weeks.at(-1)! - weeks[0])) * chartWidth);
   const y = (value: number) =>
     padding.top + ((yMax - value) / (yMax - yMin)) * chartHeight;
-  const tickStep = metric === "rating" ? 1 : 2;
-  const yTicks = Array.from(
-    { length: Math.floor((yMax - yMin) / tickStep) + 1 },
-    (_, index) => yMin + index * tickStep,
-  );
+  const yTicks = axis.ticks;
 
   useEffect(() => {
     const container = scrollContainer.current;
@@ -162,28 +138,12 @@ export function SeasonChart({
           </g>
         ))}
 
-        {visible.map((player) => {
-          const rows = summaries
-            .filter(
-              (row) =>
-                row.player_id === player.player_id &&
-                (!player.eviction_week ||
-                  row.week <= player.eviction_week) &&
-                (metric === "rating" || row.price !== ""),
-            )
-            .sort((left, right) => left.week - right.week);
-          const points = rows.map((row) => ({
-            x: x(row.week),
-            y: y(
-              metric === "rating"
-                ? Number(row.average_rating)
-                : Number(row.price),
-            ),
-            value:
-              metric === "rating"
-                ? Number(row.average_rating)
-                : Number(row.price),
-            week: row.week,
+        {visible.map(({ player, points: seriesPoints }) => {
+          const points = seriesPoints.map((point) => ({
+            x: x(point.week),
+            y: y(point.value),
+            value: point.value,
+            week: point.week,
           }));
           const path = points
             .map(
