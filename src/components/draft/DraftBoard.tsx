@@ -2,17 +2,22 @@ import clsx from "clsx";
 import type { ResolvedDraftTeam } from "../../lib/draftCalculations";
 import type { Player } from "../../types";
 import { PlayerAvatar } from "../PlayerAvatar";
+import { CrownIcon } from "./CrownIcon";
 import { isEvicted, playerName } from "./helpers";
 
 interface DraftBoardProps {
   players: Player[];
   teams: ResolvedDraftTeam[];
+  selectedWeek: number;
+  hohPlayer: Player | null;
   onViewPlayer: (playerId: number) => void;
 }
 
 export function DraftBoard({
   players,
   teams,
+  selectedWeek,
+  hohPlayer,
   onViewPlayer,
 }: DraftBoardProps) {
   return (
@@ -36,15 +41,31 @@ export function DraftBoard({
 
       <div className="-mx-3 pb-1 sm:mx-0 sm:pb-3">
         <div className="grid grid-cols-5 gap-0.5 sm:gap-2 lg:gap-3">
-          {teams.map((team) => (
-            <div
-              key={team.id}
-              className="min-w-0 overflow-hidden rounded-sm border border-border-subtle bg-neutral-bg3 sm:rounded-xl"
-            >
+          {teams.map((team) => {
+            const teamHoh = team.players.find(
+              (player) => player.player_id === hohPlayer?.player_id,
+            );
+
+            return (
+              <div
+                key={team.id}
+                className={clsx(
+                  "min-w-0 overflow-hidden rounded-sm border bg-neutral-bg3 sm:rounded-xl",
+                  teamHoh
+                    ? "border-amber-400/70"
+                    : "border-border-subtle",
+                )}
+              >
               <div className="border-b border-border-subtle bg-neutral-bg4 px-0.5 py-1.5 text-center sm:px-3 sm:py-3">
                 <h3 className="truncate text-[9px] font-bold leading-none sm:text-base sm:leading-normal">
                   {team.name}
                 </h3>
+                {teamHoh && (
+                  <p className="mt-1 hidden items-center justify-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-300 sm:flex">
+                    <CrownIcon className="h-3.5 w-3.5" />
+                    W{selectedWeek} HOH: {playerName(teamHoh)}
+                  </p>
+                )}
                 <p
                   className={clsx(
                     "mt-1 text-[7px] font-semibold leading-none sm:mt-0.5 sm:text-xs sm:leading-normal",
@@ -62,6 +83,7 @@ export function DraftBoard({
               <div className="space-y-0.5 p-0.5 sm:space-y-2 sm:p-2">
                 {team.players.map((player) => {
                   const evicted = isEvicted(player);
+                  const isHoh = player.player_id === hohPlayer?.player_id;
 
                   return (
                     <button
@@ -70,7 +92,9 @@ export function DraftBoard({
                       onClick={() => onViewPlayer(player.player_id)}
                       className={clsx(
                         "group relative block aspect-[4/5] w-full overflow-hidden rounded-[3px] border bg-neutral-bg2 text-left sm:rounded-lg",
-                        evicted
+                        isHoh
+                          ? "border-amber-300 shadow-[0_0_14px_rgba(251,191,36,0.35)]"
+                          : evicted
                           ? "border-status-error/70"
                           : "border-border-subtle",
                       )}
@@ -81,6 +105,12 @@ export function DraftBoard({
                         square
                         evicted={evicted}
                       />
+                      {isHoh && (
+                        <span className="absolute right-0.5 top-0.5 flex items-center gap-0.5 rounded-sm bg-amber-300 px-0.5 py-0.5 text-[6px] font-black uppercase text-amber-950 shadow-lg sm:right-1.5 sm:top-1.5 sm:gap-1 sm:rounded-full sm:px-2 sm:text-[9px]">
+                          <CrownIcon className="h-2 w-2 sm:h-3 sm:w-3" />
+                          HOH
+                        </span>
+                      )}
                       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/75 to-transparent px-0.5 pb-0.5 pt-4 sm:px-2 sm:pb-2 sm:pt-8">
                         <p className="truncate text-[7px] font-black uppercase leading-none tracking-tight text-white sm:text-sm sm:leading-normal sm:tracking-wide">
                           {playerName(player)}
@@ -108,7 +138,8 @@ export function DraftBoard({
                 })}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

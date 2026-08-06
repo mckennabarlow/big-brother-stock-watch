@@ -64,4 +64,10 @@ export interface StockWatchDataset {
   summaries: WeeklySummary[];
 }
 
+export interface WeeklyEvent {
+  week: number;
+  type: "hoh";
+  player_slug: string;
+}
+
 export type Metric = "rating" | "price";

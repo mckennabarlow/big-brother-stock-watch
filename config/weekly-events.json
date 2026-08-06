@@ -1,0 +1,24 @@
+{
+  "bb28": [
+    {
+      "week": 1,
+      "type": "hoh",
+      "player_slug": "dee"
+    },
+    {
+      "week": 2,
+      "type": "hoh",
+      "player_slug": "devens"
+    },
+    {
+      "week": 3,
+      "type": "hoh",
+      "player_slug": "kamu"
+    },
+    {
+      "week": 4,
+      "type": "hoh",
+      "player_slug": "haley"
+    }
+  ]
+}

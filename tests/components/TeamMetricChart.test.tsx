@@ -62,23 +62,28 @@ const teams = [
   { id: "two", name: "Team Two", players: [] },
 ];
 
-function renderChart(metric: Metric, onSelectTeam = vi.fn()) {
-  render(
+function renderChart(
+  metric: Metric,
+  onSelectTeam = vi.fn(),
+  events: { week: number; type: "hoh"; player_slug: string }[] = [],
+) {
+  const result = render(
     <TeamMetricChart
       dataset={dataset}
       teams={teams}
       weeks={[1]}
       metric={metric}
+      events={events}
       selectedTeamId="one"
       onSelectTeam={onSelectTeam}
     />,
   );
-  return onSelectTeam;
+  return { ...result, onSelectTeam };
 }
 
 describe("TeamMetricChart", () => {
   it("exposes selected state and reports team button clicks", () => {
-    const onSelectTeam = renderChart("rating");
+    const { onSelectTeam } = renderChart("rating");
     const selected = screen.getByRole("button", { name: "Team One" });
     const other = screen.getByRole("button", { name: "Team Two" });
 
@@ -116,12 +121,23 @@ describe("TeamMetricChart", () => {
   );
 
   it("formats point values and reports a chart-series click", () => {
-    const onSelectTeam = renderChart("price");
+    const { onSelectTeam } = renderChart("price");
     const point = screen.getByText("Team One, week 1: $11.00");
 
     fireEvent.click(point);
 
     expect(onSelectTeam).toHaveBeenCalledOnce();
     expect(onSelectTeam).toHaveBeenCalledWith("one");
+  });
+
+  it("marks the correct team and week when a rostered player wins HOH", () => {
+    const { container } = renderChart("rating", vi.fn(), [
+      { week: 1, type: "hoh", player_slug: "alpha" },
+    ]);
+
+    expect(
+      screen.getByText("Team One, week 1: 7.00; HOH: ALPHA"),
+    ).toBeInTheDocument();
+    expect(container.querySelector('path[fill="#fbbf24"]')).not.toBeNull();
   });
 });

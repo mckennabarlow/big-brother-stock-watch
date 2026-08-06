@@ -1,5 +1,10 @@
 import { useMemo, useState } from "react";
 import {
+  eventPlayer,
+  hohEventForWeek,
+  seasonEvents,
+} from "../events";
+import {
   buildTeamWeeklySeries,
   calculatePlayerChanges,
   calculatePlayerStats,
@@ -33,6 +38,14 @@ export default function DraftDashboard({
   onViewPlayer,
 }: DraftDashboardProps) {
   const [selectedTeamId, setSelectedTeamId] = useState(DRAFT_TEAMS[0].id);
+  const events = useMemo(
+    () => seasonEvents(dataset.metadata.slug),
+    [dataset.metadata.slug],
+  );
+  const selectedWeekHoh = eventPlayer(
+    hohEventForWeek(events, selectedWeek),
+    dataset.players,
+  );
   const teams = useMemo(
     () => resolveDraftTeams(dataset, DRAFT_TEAMS).teams,
     [dataset],
@@ -77,6 +90,8 @@ export default function DraftDashboard({
       <DraftBoard
         players={dataset.players}
         teams={teams}
+        selectedWeek={selectedWeek}
+        hohPlayer={selectedWeekHoh}
         onViewPlayer={onViewPlayer}
       />
 
@@ -85,6 +100,7 @@ export default function DraftDashboard({
         teams={teams}
         weeks={weeks}
         metric={metric}
+        events={events}
         selectedTeamId={selectedTeam.id}
         onSelectTeam={setSelectedTeamId}
       />
@@ -97,6 +113,7 @@ export default function DraftDashboard({
         teamStandings={teamStandings}
         selectedTeam={selectedTeam}
         selectedTeamPlayerStats={selectedTeamPlayerStats}
+        hohPlayer={selectedWeekHoh}
         onSelectWeek={onSelectWeek}
         onSelectTeam={setSelectedTeamId}
         onViewPlayer={onViewPlayer}
@@ -111,6 +128,22 @@ export default function DraftDashboard({
           biggestPlayerChange={movement.biggestPlayerChange}
           movementExplanation={movement.explanation}
           trend={trend}
+          hohPlayer={
+            selectedWeekHoh &&
+            selectedTeam.players.some(
+              (player) => player.player_id === selectedWeekHoh.player_id,
+            )
+              ? selectedWeekHoh
+              : null
+          }
+          hohPlayerChange={
+            selectedWeekHoh
+              ? (playerChangeResult.changes.find(
+                  (change) =>
+                    change.player.player_id === selectedWeekHoh.player_id,
+                ) ?? null)
+              : null
+          }
         />
       </DraftStandings>
     </div>

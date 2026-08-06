@@ -5,7 +5,7 @@ import {
   teamAxisBounds,
   type ChartTeam,
 } from "../lib/chartCalculations";
-import type { Metric, StockWatchDataset } from "../types";
+import type { Metric, StockWatchDataset, WeeklyEvent } from "../types";
 
 const TEAM_COLORS = ["#A78BFA", "#38BDF8", "#34D399", "#FBBF24", "#FB7185"];
 
@@ -14,6 +14,7 @@ interface TeamMetricChartProps {
   teams: ChartTeam[];
   weeks: number[];
   metric: Metric;
+  events: WeeklyEvent[];
   selectedTeamId: string;
   onSelectTeam: (teamId: string) => void;
 }
@@ -23,6 +24,7 @@ export function TeamMetricChart({
   teams,
   weeks,
   metric,
+  events,
   selectedTeamId,
   onSelectTeam,
 }: TeamMetricChartProps) {
@@ -81,7 +83,7 @@ export function TeamMetricChart({
           <p className="mt-1 text-sm text-text-secondary">
             Combined weekly {metric === "price" ? "stock prices" : "ratings"}{" "}
             for each roster. A player&apos;s eviction-week result is their final
-            contribution.
+            contribution. Gold crowns mark HOH wins.
           </p>
         </div>
         <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
@@ -198,23 +200,47 @@ export function TeamMetricChart({
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                {team.points.map((point) => (
-                  <circle
-                    key={point.week}
-                    cx={x(point.week)}
-                    cy={y(point.value)}
-                    r={selected ? 7 : 5}
-                    fill="#121218"
-                    stroke={team.color}
-                    strokeWidth="3"
-                  >
-                    <title>
-                      {team.name}, week {point.week}:{" "}
-                      {metric === "price" ? "$" : ""}
-                      {point.value.toFixed(2)}
-                    </title>
-                  </circle>
-                ))}
+                {team.points.map((point) => {
+                  const hohEvent = events.find(
+                    (event) =>
+                      event.type === "hoh" && event.week === point.week,
+                  );
+                  const hohPlayer = hohEvent
+                    ? team.players.find(
+                        (player) => player.slug === hohEvent.player_slug,
+                      )
+                    : null;
+
+                  return (
+                    <g key={point.week}>
+                      {hohPlayer && (
+                        <path
+                          d="M-9 3-7-6l5 4 2-7 3 7 5-4 1 9H-9Z"
+                          fill="#fbbf24"
+                          stroke="#fef3c7"
+                          strokeLinejoin="round"
+                          strokeWidth="1"
+                          transform={`translate(${x(point.week)} ${y(point.value) - 15})`}
+                        />
+                      )}
+                      <circle
+                        cx={x(point.week)}
+                        cy={y(point.value)}
+                        r={selected ? 7 : 5}
+                        fill={hohPlayer ? "#fbbf24" : "#121218"}
+                        stroke={hohPlayer ? "#fef3c7" : team.color}
+                        strokeWidth="3"
+                      >
+                        <title>
+                          {team.name}, week {point.week}:{" "}
+                          {metric === "price" ? "$" : ""}
+                          {point.value.toFixed(2)}
+                          {hohPlayer ? `; HOH: ${hohPlayer.nickname}` : ""}
+                        </title>
+                      </circle>
+                    </g>
+                  );
+                })}
               </g>
             );
           })}

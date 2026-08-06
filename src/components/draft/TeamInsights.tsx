@@ -5,7 +5,8 @@ import type {
   TeamTrend,
 } from "../../lib/draftCalculations";
 import { formatChange, formatMetric } from "../../lib/metrics";
-import type { Metric } from "../../types";
+import type { Metric, Player } from "../../types";
+import { CrownIcon } from "./CrownIcon";
 import { isEvicted, playerName } from "./helpers";
 
 interface TeamInsightsProps {
@@ -18,6 +19,8 @@ interface TeamInsightsProps {
   biggestPlayerChange: PlayerChange | null;
   movementExplanation: string;
   trend: TeamTrend;
+  hohPlayer: Player | null;
+  hohPlayerChange: PlayerChange | null;
 }
 
 export function TeamInsights({
@@ -30,6 +33,8 @@ export function TeamInsights({
   biggestPlayerChange,
   movementExplanation,
   trend,
+  hohPlayer,
+  hohPlayerChange,
 }: TeamInsightsProps) {
   const activePlayers = selectedTeam.players.filter(
     (player) => !isEvicted(player),
@@ -48,6 +53,28 @@ export function TeamInsights({
           movement.
         </p>
       </div>
+
+      {hohPlayer && (
+        <div className="mb-3 flex items-start gap-3 rounded-xl border border-amber-400/50 bg-amber-400/10 p-4">
+          <span className="rounded-full bg-amber-300 p-2 text-amber-950">
+            <CrownIcon className="h-5 w-5" />
+          </span>
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-amber-300">
+              Week {selectedWeek} Head of Household
+            </p>
+            <p className="mt-1 text-lg font-bold text-amber-100">
+              {playerName(hohPlayer)} gives {selectedTeam.name} control of the
+              house.
+            </p>
+            <p className="mt-1 text-sm text-amber-100/75">
+              {hohPlayerChange
+                ? `Their ${metric} moved ${formatChange(hohPlayerChange.change, metric)} from Week ${previousWeek} to Week ${selectedWeek}.`
+                : `This is contextual only and does not add bonus points to the team's ${metric} total.`}
+            </p>
+          </div>
+        </div>
+      )}
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
         <InsightCard

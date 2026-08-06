@@ -9,6 +9,7 @@ import { playerColor } from "../../lib/chartCalculations";
 import { formatMetric } from "../../lib/metrics";
 import type { Metric, Player } from "../../types";
 import { PlayerAvatar } from "../PlayerAvatar";
+import { CrownIcon } from "./CrownIcon";
 import { isEvicted, ordinal, playerName } from "./helpers";
 
 interface DraftStandingsProps {
@@ -16,6 +17,7 @@ interface DraftStandingsProps {
   weeks: number[];
   selectedWeek: number;
   metric: Metric;
+  hohPlayer: Player | null;
   teamStandings: TeamStanding[];
   selectedTeam: ResolvedDraftTeam;
   selectedTeamPlayerStats: PlayerStat[];
@@ -30,6 +32,7 @@ export function DraftStandings({
   weeks,
   selectedWeek,
   metric,
+  hohPlayer,
   teamStandings,
   selectedTeam,
   selectedTeamPlayerStats,
@@ -81,6 +84,9 @@ export function DraftStandings({
       <ol className="space-y-2">
         {teamStandings.map((team, index) => {
           const selected = team.id === selectedTeam.id;
+          const teamHasHoh = team.players.some(
+            (player) => player.player_id === hohPlayer?.player_id,
+          );
 
           return (
             <li key={team.id}>
@@ -117,6 +123,12 @@ export function DraftStandings({
                       {team.activeCount} remaining
                     </span>
                   </span>
+                  {teamHasHoh && hohPlayer && (
+                    <span className="mt-1 flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-amber-300">
+                      <CrownIcon className="h-3 w-3" />
+                      HOH: {playerName(hohPlayer)}
+                    </span>
+                  )}
                   <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-neutral-bg4">
                     <span
                       className="block h-full rounded-full bg-gradient-to-r from-brand to-cyan-400"
@@ -164,13 +176,19 @@ export function DraftStandings({
           {selectedTeamPlayerStats.map(
             ({ player, currentValue, highestValue, cumulativeValue }) => {
               const evicted = isEvicted(player);
+              const isHoh = player.player_id === hohPlayer?.player_id;
 
               return (
                 <button
                   type="button"
                   key={player.player_id}
                   onClick={() => onViewPlayer(player.player_id)}
-                  className="rounded-xl border border-border-subtle bg-neutral-bg3 p-4 text-left transition-colors hover:border-border"
+                  className={clsx(
+                    "rounded-xl border bg-neutral-bg3 p-4 text-left transition-colors hover:border-border",
+                    isHoh
+                      ? "border-amber-400/70 shadow-[0_0_16px_rgba(251,191,36,0.16)]"
+                      : "border-border-subtle",
+                  )}
                 >
                   <div className="flex items-center gap-3">
                     <PlayerAvatar
@@ -184,7 +202,12 @@ export function DraftStandings({
                       evicted={evicted}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-bold">{playerName(player)}</p>
+                      <p className="flex items-center gap-1 truncate font-bold">
+                        {isHoh && (
+                          <CrownIcon className="h-4 w-4 shrink-0 text-amber-300" />
+                        )}
+                        <span className="truncate">{playerName(player)}</span>
+                      </p>
                       <p
                         className={clsx(
                           "mt-0.5 text-xs",
