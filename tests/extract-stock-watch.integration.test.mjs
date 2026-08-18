@@ -18,6 +18,17 @@ const laterSnapshot = join(
   "raw",
   "bb28-20260804T183629Z.html",
 );
+const historicalOverrides = JSON.parse(await readFile(
+  join(repositoryRoot, "config", "historical-overrides.json"),
+  "utf8",
+));
+const earlySeasonHistoricalOverrides = {
+  bb28: {
+    players: historicalOverrides.bb28.players.filter(
+      (player) => player.eviction_week <= 3,
+    ),
+  },
+};
 const temporaryRoots = [];
 
 async function temporaryRoot() {
@@ -38,7 +49,10 @@ describe("extract-stock-watch CLI orchestration", () => {
 
     const result = await runExtraction(
       { input: firstSnapshot, url: null, outputRoot },
-      { now: () => new Date("2026-08-04T12:00:00.000Z") },
+      {
+        now: () => new Date("2026-08-04T12:00:00.000Z"),
+        historicalOverrides: earlySeasonHistoricalOverrides,
+      },
     );
 
     expect(result.exitCode).toBe(0);
@@ -157,6 +171,7 @@ describe("extract-stock-watch CLI orchestration", () => {
           return { ok: true, text: async () => html };
         },
         now: () => new Date("2026-08-04T12:34:56.000Z"),
+        historicalOverrides: earlySeasonHistoricalOverrides,
       },
     );
 

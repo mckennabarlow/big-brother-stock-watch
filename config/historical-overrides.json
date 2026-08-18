@@ -62,6 +62,17 @@
         "eviction_week": 3,
         "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/jason-de-puy.png",
         "weeks": []
+      },
+      {
+        "player_id": 180,
+        "first_name": "Chuk",
+        "last_name": "Anyanwu",
+        "nickname": "Chuk",
+        "slug": "chuk",
+        "status": "evicted",
+        "eviction_week": 5,
+        "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/chuk-anyanwu.png",
+        "weeks": []
       }
     ]
   }

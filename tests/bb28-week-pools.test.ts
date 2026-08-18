@@ -26,14 +26,14 @@ describe("BB28 Week 1-6 pools", () => {
   });
 
   it.each([
-    ["ashley", 1],
-    ["chuk", 4],
-    ["rome", 2],
-    ["jason", 3],
-    ["lyric", 4],
+    ["ashley", 1, 1],
+    ["chuk", 5, 4],
+    ["rome", 2, 2],
+    ["jason", 3, 3],
+    ["lyric", 4, 4],
   ])(
-    "%s appears through eviction Week %s and never afterward",
-    (slug, evictionWeek) => {
+    "%s was evicted in Week %s after being scored through Week %s",
+    (slug, evictionWeek, lastScoredWeek) => {
       const player = dataset.players.find((item) => item.slug === slug);
       expect(player).toBeDefined();
       expect(player?.eviction_week).toBe(evictionWeek);
@@ -42,7 +42,7 @@ describe("BB28 Week 1-6 pools", () => {
         .filter((row) => row.player_id === player?.player_id)
         .map((row) => row.week);
       expect(representedWeeks).toEqual(
-        Array.from({ length: evictionWeek }, (_, index) => index + 1),
+        Array.from({ length: lastScoredWeek }, (_, index) => index + 1),
       );
       expect(
         isPlayerEligibleInWeek(player!, evictionWeek),
