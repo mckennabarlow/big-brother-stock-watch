@@ -10,12 +10,14 @@ import type { StockWatchDataset } from "../src/types";
 
 const dataset = rawDataset as StockWatchDataset;
 
-describe("BB28 Week 1-4 pools", () => {
+describe("BB28 Week 1-6 pools", () => {
   it.each([
     [1, 17],
     [2, 16],
     [3, 15],
     [4, 14],
+    [5, 12],
+    [6, 12],
   ])("Week %s has exactly %s summary players", (week, expected) => {
     const rows = dataset.summaries.filter((row) => row.week === week);
 
@@ -25,8 +27,10 @@ describe("BB28 Week 1-4 pools", () => {
 
   it.each([
     ["ashley", 1],
+    ["chuk", 4],
     ["rome", 2],
     ["jason", 3],
+    ["lyric", 4],
   ])(
     "%s appears through eviction Week %s and never afterward",
     (slug, evictionWeek) => {
@@ -54,6 +58,8 @@ describe("BB28 Week 1-4 pools", () => {
     [2, 15],
     [3, 15],
     [4, 14],
+    [5, 12],
+    [6, 12],
   ])(
     "Week %s has exactly %s price-bearing summaries",
     (week, expected) => {
@@ -74,8 +80,8 @@ describe("BB28 Week 1-4 pools", () => {
     },
   );
 
-  it("contains exactly the four available weeks without duplicates", () => {
-    expect(seasonWeeks(dataset.summaries)).toEqual([1, 2, 3, 4]);
-    expect(dataset.metadata.current_week).toBe(4);
+  it("contains exactly the six available weeks without duplicates", () => {
+    expect(seasonWeeks(dataset.summaries)).toEqual([1, 2, 3, 4, 5, 6]);
+    expect(dataset.metadata.current_week).toBe(6);
   });
 });

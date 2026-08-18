@@ -5,6 +5,8 @@ Brother Stock Watch ratings and prices.
 
 ## View the dashboard
 
+Live dashboard: [mckennabarlow.github.io/big-brother-stock-watch](https://mckennabarlow.github.io/big-brother-stock-watch/)
+
 Requires Node.js 20 or newer.
 
 ```powershell
