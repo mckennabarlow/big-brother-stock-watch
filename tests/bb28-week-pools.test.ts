@@ -33,6 +33,7 @@ describe("BB28 Week 1-7 pools", () => {
     ["jason", 3, 3],
     ["lyric", 4, 4],
     ["kamu", 6, 6],
+    ["mallory", 7, 7],
   ])(
     "%s was evicted in Week %s after being scored through Week %s",
     (slug, evictionWeek, lastScoredWeek) => {

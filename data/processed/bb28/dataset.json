@@ -6,8 +6,8 @@
     "status": "closed",
     "current_week": 7,
     "closes_at": "2026-08-28T20:00:00.000000Z",
-    "source": "https://realitystockwatch.com/trades",
-    "extracted_at": "2026-08-28T18:07:08.728Z"
+    "source": "C:\\Users\\mcbarlow\\big-brother-stock-watch\\data\\raw\\bb28-20260828T180709Z.html",
+    "extracted_at": "2026-08-31T16:36:40.588Z"
   },
   "players": [
     {
@@ -149,9 +149,9 @@
       "last_name": "Aurichio",
       "nickname": "Mallory",
       "slug": "mallory",
-      "status": "active",
-      "eviction_week": null,
-      "image_url": "https://realitystockwatch.com/storage//houseguests/bb28/mallory-aurichio.png"
+      "status": "evicted",
+      "eviction_week": 7,
+      "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/mallory-aurichio.png"
     },
     {
       "season": "bb28",

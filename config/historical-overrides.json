@@ -73,6 +73,17 @@
         "eviction_week": 5,
         "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/chuk-anyanwu.png",
         "weeks": []
+      },
+      {
+        "player_id": 187,
+        "first_name": "Mallory",
+        "last_name": "Aurichio",
+        "nickname": "Mallory",
+        "slug": "mallory",
+        "status": "evicted",
+        "eviction_week": 7,
+        "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/mallory-aurichio.png",
+        "weeks": []
       }
     ]
   }
