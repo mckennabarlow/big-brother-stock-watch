@@ -3,8 +3,8 @@
   "name": "Big Brother 28",
   "slug": "bb28",
   "status": "closed",
-  "current_week": 7,
-  "closes_at": "2026-08-28T20:00:00.000000Z",
-  "source": "C:\\Users\\mcbarlow\\big-brother-stock-watch\\data\\raw\\bb28-20260828T180709Z.html",
-  "extracted_at": "2026-08-31T16:36:40.588Z"
+  "current_week": 8,
+  "closes_at": "2026-09-04T20:00:00.000000Z",
+  "source": "C:\\Users\\mcbarlow\\big-brother-stock-watch\\data\\raw\\bb28-20260904T152551Z.html",
+  "extracted_at": "2026-09-04T15:27:32.250Z"
 }

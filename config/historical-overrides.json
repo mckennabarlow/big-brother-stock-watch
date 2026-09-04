@@ -84,6 +84,17 @@
         "eviction_week": 7,
         "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/mallory-aurichio.png",
         "weeks": []
+      },
+      {
+        "player_id": 185,
+        "first_name": "LaTrice",
+        "last_name": "Verrett",
+        "nickname": "LaTrice",
+        "slug": "latrice",
+        "status": "evicted",
+        "eviction_week": 8,
+        "image_url": "https://realitystockwatch.com/storage/houseguests/bb28/latrice-verrett.png",
+        "weeks": []
       }
     ]
   }
