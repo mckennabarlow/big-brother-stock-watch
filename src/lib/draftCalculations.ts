@@ -3,6 +3,7 @@ import type {
   Metric,
   Player,
   StockWatchDataset,
+  TeamScoreMode,
   WeeklySummary,
 } from "../types";
 import {
@@ -137,6 +138,7 @@ export function calculateTeamStandings(
   teams: ResolvedDraftTeam[],
   metric: Metric,
   selectedWeek: number,
+  scoreMode: TeamScoreMode = "total",
 ): TeamStanding[] {
   const standings = teams
     .map((team, rosterIndex) => {
@@ -144,7 +146,9 @@ export function calculateTeamStandings(
         team.players.map((player) => [player.player_id, player]),
       );
       let currentValue = 0;
+      let currentContributors = 0;
       let cumulativeTotal = 0;
+      let cumulativeContributors = 0;
 
       for (const row of dataset.summaries) {
         const player = playersById.get(row.player_id);
@@ -156,12 +160,25 @@ export function calculateTeamStandings(
           continue;
         }
         cumulativeTotal += value;
+        cumulativeContributors += 1;
         if (row.week === selectedWeek) {
           currentValue += value;
+          currentContributors += 1;
         }
       }
 
-      return { ...team, currentValue, cumulativeTotal, rosterIndex };
+      return {
+        ...team,
+        currentValue:
+          scoreMode === "normalized" && currentContributors > 0
+            ? currentValue / currentContributors
+            : currentValue,
+        cumulativeTotal:
+          scoreMode === "normalized" && cumulativeContributors > 0
+            ? cumulativeTotal / cumulativeContributors
+            : cumulativeTotal,
+        rosterIndex,
+      };
     })
     .sort(
       (left, right) =>
@@ -216,20 +233,29 @@ export function buildTeamWeeklySeries(
   metric: Metric,
   weeks: number[],
   selectedWeek = Number.POSITIVE_INFINITY,
+  scoreMode: TeamScoreMode = "total",
 ): TeamWeeklyValue[] {
   return weeks
     .filter((week) => week <= selectedWeek)
-    .map((week) => ({
-      week,
-      value: team.players.reduce((sum, player) => {
+    .map((week) => {
+      const values = team.players.flatMap((player) => {
         const row = dataset.summaries.find(
           (summary) =>
             summary.player_id === player.player_id &&
             summary.week === week,
         );
-        return sum + (eligibleValue(row, player, metric) ?? 0);
-      }, 0),
-    }));
+        const value = eligibleValue(row, player, metric);
+        return value === null ? [] : [value];
+      });
+      const total = values.reduce((sum, value) => sum + value, 0);
+      return {
+        week,
+        value:
+          scoreMode === "normalized" && values.length > 0
+            ? total / values.length
+            : total,
+      };
+    });
 }
 
 export function previousAvailableWeek(

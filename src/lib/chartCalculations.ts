@@ -1,4 +1,9 @@
-import type { Metric, Player, WeeklySummary } from "../types";
+import type {
+  Metric,
+  Player,
+  TeamScoreMode,
+  WeeklySummary,
+} from "../types";
 import {
   hasMetricValue,
   isPlayerEligibleInWeek,
@@ -90,6 +95,7 @@ export function buildTeamSeries(
   teams: ChartTeam[],
   weeks: number[],
   metric: Metric,
+  scoreMode: TeamScoreMode = "total",
 ): TeamChartSeries[] {
   const chartWeeks = sortedUniqueWeeks(weeks);
 
@@ -98,7 +104,7 @@ export function buildTeamSeries(
       team.players.map((player) => [player.player_id, player]),
     );
     const points = chartWeeks.map((week) => {
-      const value = summaries
+      const values = summaries
         .filter((row) => {
           const player = playersById.get(row.player_id);
           return (
@@ -108,9 +114,32 @@ export function buildTeamSeries(
             hasMetricValue(row, metric)
           );
         })
-        .reduce((sum, row) => sum + metricValue(row, metric)!, 0);
+        .map((row) => metricValue(row, metric)!);
+      const total = values.reduce((sum, value) => sum + value, 0);
+      const normalizedValues = new Map<number, number>();
+      for (const row of summaries) {
+        const player = playersById.get(row.player_id);
+        if (
+          player !== undefined &&
+          row.week === week &&
+          isPlayerEligibleInWeek(player, week) &&
+          hasMetricValue(row, metric)
+        ) {
+          normalizedValues.set(row.player_id, metricValue(row, metric)!);
+        }
+      }
+      const normalizedTotal = [...normalizedValues.values()].reduce(
+        (sum, value) => sum + value,
+        0,
+      );
 
-      return { week, value };
+      return {
+        week,
+        value:
+          scoreMode === "normalized" && normalizedValues.size > 0
+            ? normalizedTotal / normalizedValues.size
+            : total,
+      };
     });
 
     return { ...team, points };

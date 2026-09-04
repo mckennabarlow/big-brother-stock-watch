@@ -14,7 +14,7 @@ import {
   summarizeTeamMovement,
 } from "../lib/draftCalculations";
 import { DRAFT_TEAMS } from "../teams";
-import type { Metric, StockWatchDataset } from "../types";
+import type { Metric, StockWatchDataset, TeamScoreMode } from "../types";
 import { DraftBoard } from "./draft/DraftBoard";
 import { DraftStandings } from "./draft/DraftStandings";
 import { TeamInsights } from "./draft/TeamInsights";
@@ -38,6 +38,7 @@ export default function DraftDashboard({
   onViewPlayer,
 }: DraftDashboardProps) {
   const [selectedTeamId, setSelectedTeamId] = useState(DRAFT_TEAMS[0].id);
+  const [scoreMode, setScoreMode] = useState<TeamScoreMode>("total");
   const events = useMemo(
     () => seasonEvents(dataset.metadata.slug),
     [dataset.metadata.slug],
@@ -51,8 +52,9 @@ export default function DraftDashboard({
     [dataset],
   );
   const teamStandings = useMemo(
-    () => calculateTeamStandings(dataset, teams, metric, selectedWeek),
-    [dataset, teams, metric, selectedWeek],
+    () =>
+      calculateTeamStandings(dataset, teams, metric, selectedWeek, scoreMode),
+    [dataset, teams, metric, selectedWeek, scoreMode],
   );
   const selectedTeam =
     teams.find((team) => team.id === selectedTeamId) ?? teams[0];
@@ -68,6 +70,7 @@ export default function DraftDashboard({
     metric,
     weeks,
     selectedWeek,
+    scoreMode,
   );
   const playerChangeResult = calculatePlayerChanges(
     dataset,
@@ -100,6 +103,7 @@ export default function DraftDashboard({
         teams={teams}
         weeks={weeks}
         metric={metric}
+        scoreMode={scoreMode}
         events={events}
         selectedTeamId={selectedTeam.id}
         onSelectTeam={setSelectedTeamId}
@@ -110,6 +114,8 @@ export default function DraftDashboard({
         weeks={weeks}
         selectedWeek={selectedWeek}
         metric={metric}
+        scoreMode={scoreMode}
+        onScoreModeChange={setScoreMode}
         teamStandings={teamStandings}
         selectedTeam={selectedTeam}
         selectedTeamPlayerStats={selectedTeamPlayerStats}
@@ -123,6 +129,7 @@ export default function DraftDashboard({
           selectedWeek={selectedWeek}
           previousWeek={playerChangeResult.previousWeek}
           metric={metric}
+          scoreMode={scoreMode}
           currentTeamValue={movement.currentValue}
           teamChange={movement.change}
           biggestPlayerChange={movement.biggestPlayerChange}

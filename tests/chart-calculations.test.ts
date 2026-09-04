@@ -118,6 +118,22 @@ describe("chart calculations", () => {
     ]);
   });
 
+  it("normalizes each team week by eligible players with recorded values", () => {
+    const [series] = buildTeamSeries(
+      rows,
+      [{ id: "one", name: "One", players: [alpha, bravo] }],
+      [1, 2, 3],
+      "rating",
+      "normalized",
+    );
+
+    expect(series.points).toEqual([
+      { week: 1, value: 5 },
+      { week: 2, value: 7 },
+      { week: 3, value: 9 },
+    ]);
+  });
+
   it.each([
     ["player price empty", playerAxisBounds("price", [])],
     ["player price single", playerAxisBounds("price", [13])],

@@ -175,6 +175,19 @@ describe("calculateTeamStandings", () => {
     expect(team.cumulativeTotal).toBe(28);
   });
 
+  it("normalizes current and cumulative scores by eligible player results", () => {
+    const [team] = calculateTeamStandings(
+      fixture,
+      [resolvedTeams()[0]],
+      "rating",
+      3,
+      "normalized",
+    );
+
+    expect(team.currentValue).toBe(8);
+    expect(team.cumulativeTotal).toBe(7);
+  });
+
   it("scales each positive team score relative to the leader", () => {
     const result = calculateTeamStandings(
       fixture,
@@ -298,6 +311,23 @@ describe("buildTeamWeeklySeries", () => {
 
     expect(result).toEqual([
       { week: 1, value: 11 },
+      { week: 2, value: 9 },
+      { week: 3, value: 8 },
+    ]);
+  });
+
+  it("normalizes each week by eligible players with recorded values", () => {
+    const result = buildTeamWeeklySeries(
+      fixture,
+      resolvedTeams()[0],
+      "rating",
+      [1, 2, 3],
+      Number.POSITIVE_INFINITY,
+      "normalized",
+    );
+
+    expect(result).toEqual([
+      { week: 1, value: 5.5 },
       { week: 2, value: 9 },
       { week: 3, value: 8 },
     ]);

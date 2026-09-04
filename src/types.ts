@@ -71,3 +71,5 @@ export interface WeeklyEvent {
 }
 
 export type Metric = "rating" | "price";
+
+export type TeamScoreMode = "total" | "normalized";

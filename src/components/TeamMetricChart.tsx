@@ -5,7 +5,12 @@ import {
   teamAxisBounds,
   type ChartTeam,
 } from "../lib/chartCalculations";
-import type { Metric, StockWatchDataset, WeeklyEvent } from "../types";
+import type {
+  Metric,
+  StockWatchDataset,
+  TeamScoreMode,
+  WeeklyEvent,
+} from "../types";
 
 const TEAM_COLORS = ["#A78BFA", "#38BDF8", "#34D399", "#FBBF24", "#FB7185"];
 
@@ -14,6 +19,7 @@ interface TeamMetricChartProps {
   teams: ChartTeam[];
   weeks: number[];
   metric: Metric;
+  scoreMode?: TeamScoreMode;
   events: WeeklyEvent[];
   selectedTeamId: string;
   onSelectTeam: (teamId: string) => void;
@@ -24,6 +30,7 @@ export function TeamMetricChart({
   teams,
   weeks,
   metric,
+  scoreMode = "total",
   events,
   selectedTeamId,
   onSelectTeam,
@@ -40,6 +47,7 @@ export function TeamMetricChart({
     teams,
     chartWeeks,
     metric,
+    scoreMode,
   ).map((team, teamIndex) => {
     return {
       ...team,
@@ -78,12 +86,15 @@ export function TeamMetricChart({
             Portfolio trajectory
           </p>
           <h2 className="mt-1 text-2xl font-bold">
-            Team {metric === "price" ? "stock value" : "ratings"} over time
+            {scoreMode === "normalized" ? "Average " : "Team "}
+            {metric === "price" ? "stock value" : "ratings"} over time
           </h2>
           <p className="mt-1 text-sm text-text-secondary">
-            Combined weekly {metric === "price" ? "stock prices" : "ratings"}{" "}
-            for each roster. A player&apos;s eviction-week result is their final
-            contribution. Gold crowns mark HOH wins.
+            {scoreMode === "normalized"
+              ? `Average weekly ${metric === "price" ? "stock price" : "rating"} among eligible players with recorded values.`
+              : `Combined weekly ${metric === "price" ? "stock prices" : "ratings"} for each roster.`}{" "}
+            A player&apos;s eviction-week result is their final contribution. Gold
+            crowns mark HOH wins.
           </p>
         </div>
         <div className="flex max-w-full gap-2 overflow-x-auto pb-1">

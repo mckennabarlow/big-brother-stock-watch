@@ -5,7 +5,7 @@ import type {
   TeamTrend,
 } from "../../lib/draftCalculations";
 import { formatChange, formatMetric } from "../../lib/metrics";
-import type { Metric, Player } from "../../types";
+import type { Metric, Player, TeamScoreMode } from "../../types";
 import { CrownIcon } from "./CrownIcon";
 import { isEvicted, playerName } from "./helpers";
 
@@ -14,6 +14,7 @@ interface TeamInsightsProps {
   selectedWeek: number;
   previousWeek: number | undefined;
   metric: Metric;
+  scoreMode: TeamScoreMode;
   currentTeamValue: number;
   teamChange: number | null;
   biggestPlayerChange: PlayerChange | null;
@@ -28,6 +29,7 @@ export function TeamInsights({
   selectedWeek,
   previousWeek,
   metric,
+  scoreMode,
   currentTeamValue,
   teamChange,
   biggestPlayerChange,
@@ -116,7 +118,7 @@ export function TeamInsights({
         <InsightCard
           label="Trend analysis"
           value={trend.label}
-          detail={`${trend.detail} Current team total: ${formatMetric(currentTeamValue, metric)}.`}
+          detail={`${trend.detail} Current ${scoreMode === "normalized" ? "normalized score" : "team total"}: ${formatMetric(currentTeamValue, metric)}.`}
           tone={
             trend.label === "Trending up"
               ? "positive"
