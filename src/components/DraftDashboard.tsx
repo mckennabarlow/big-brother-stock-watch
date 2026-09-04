@@ -56,6 +56,19 @@ export default function DraftDashboard({
       calculateTeamStandings(dataset, teams, metric, selectedWeek, scoreMode),
     [dataset, teams, metric, selectedWeek, scoreMode],
   );
+  const handleScoreModeChange = (nextScoreMode: TeamScoreMode) => {
+    setScoreMode(nextScoreMode);
+    const leader = calculateTeamStandings(
+      dataset,
+      teams,
+      metric,
+      selectedWeek,
+      nextScoreMode,
+    )[0];
+    if (leader) {
+      setSelectedTeamId(leader.id);
+    }
+  };
   const selectedTeam =
     teams.find((team) => team.id === selectedTeamId) ?? teams[0];
   const selectedTeamPlayerStats = calculatePlayerStats(
@@ -115,7 +128,7 @@ export default function DraftDashboard({
         selectedWeek={selectedWeek}
         metric={metric}
         scoreMode={scoreMode}
-        onScoreModeChange={setScoreMode}
+        onScoreModeChange={handleScoreModeChange}
         teamStandings={teamStandings}
         selectedTeam={selectedTeam}
         selectedTeamPlayerStats={selectedTeamPlayerStats}
