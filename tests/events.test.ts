@@ -18,6 +18,7 @@ describe("weekly events", () => {
       { week: 3, type: "hoh", player_slug: "kamu" },
       { week: 4, type: "hoh", player_slug: "haley" },
       { week: 5, type: "hoh", player_slug: "latrice" },
+      { week: 9, type: "hoh", player_slug: "barrett" },
     ]);
   });
 
@@ -35,6 +36,7 @@ describe("weekly events", () => {
       { week: 3, team: "McKenna" },
       { week: 4, team: "McKenna" },
       { week: 5, team: "McKenna" },
+      { week: 9, team: "McKenna" },
     ]);
   });
 

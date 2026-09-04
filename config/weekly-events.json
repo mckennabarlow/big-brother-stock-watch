@@ -24,6 +24,11 @@
       "week": 5,
       "type": "hoh",
       "player_slug": "latrice"
+    },
+    {
+      "week": 9,
+      "type": "hoh",
+      "player_slug": "barrett"
     }
   ]
 }
